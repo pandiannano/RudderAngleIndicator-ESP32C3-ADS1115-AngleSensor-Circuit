@@ -1,0 +1,796 @@
+<title>Rudder Angle Schematics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#0b2338;
+    --panel:#0f3050;
+    --panel-line:rgba(223,240,250,.16);
+    --grid-dot:rgba(223,240,250,.10);
+    --ink:#eaf4fb;
+    --ink-dim:#87acc8;
+    --ink-faint:#5c85a3;
+    --power:#ffb454;
+    --data:#5eead4;
+    --sense:#c9a8ff;
+    --font-sans:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-sans);
+    line-height:1.5;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 80px;}
+
+  header.hero{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:36px 8px;}
+  .kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin:0 0 10px;}
+  h1{font-family:var(--font-sans);font-weight:700;font-size:clamp(28px,4.6vw,44px);margin:0 0 12px;text-wrap:balance;}
+  .lede{max-width:62ch;color:var(--ink-dim);font-size:15.5px;margin:0 0 22px;}
+  .doc-meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);border-top:1px solid var(--panel-line);padding-top:14px;}
+  .doc-meta b{color:var(--ink-dim);font-weight:600;}
+
+  nav.sheetnav{
+    position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
+    background:rgba(11,35,56,.92);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--panel-line);
+  }
+  .sheetnav-inner{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;gap:6px;flex-wrap:wrap;font-family:var(--font-mono);font-size:12.5px;}
+  .sheetnav-inner a{color:var(--ink-dim);text-decoration:none;padding:6px 12px;border:1px solid var(--panel-line);border-radius:3px;white-space:nowrap;}
+  .sheetnav-inner a:hover,.sheetnav-inner a:focus-visible{color:var(--ink);border-color:var(--ink-dim);outline:none;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:18px 28px;padding:16px 18px;background:var(--panel);border:1px solid var(--panel-line);border-radius:4px;margin-block:24px;}
+  .legend-item{display:flex;align-items:center;gap:9px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-dim);}
+  .swatch{width:26px;height:3px;border-radius:2px;flex:none;}
+  .sym-key{display:flex;flex-wrap:wrap;gap:16px 26px;padding:16px 18px;background:var(--panel);border:1px solid var(--panel-line);border-top:none;border-radius:0 0 4px 4px;margin-top:-24px;margin-bottom:24px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);}
+  .sym-key span b{color:var(--ink-dim);}
+
+  section.sheet{margin-block:56px;scroll-margin-top:60px;}
+  .sheet-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
+  .sheet-head h2{font-size:20px;margin:0;font-weight:600;}
+  .sheet-head .sheet-no{font-family:var(--font-mono);color:var(--ink-faint);font-size:13px;}
+  .sheet-panel{background:var(--panel);border:1px solid var(--panel-line);border-radius:4px;padding:14px;}
+  .sheet-panel svg{display:block;width:100%;height:auto;}
+  figcaption{margin-top:10px;color:var(--ink-faint);font-size:13px;}
+
+  .titleblock{font-family:var(--font-mono);font-size:10.5px;}
+  .titleblock rect{fill:var(--panel);stroke:var(--panel-line);}
+  .titleblock text{fill:var(--ink-dim);}
+  .titleblock .tb-strong{fill:var(--ink);font-weight:600;}
+
+  .wire{stroke:var(--ink);stroke-width:2;fill:none;}
+  .wire-power{stroke:var(--power);}
+  .wire-data{stroke:var(--data);}
+  .wire-sense{stroke:var(--sense);}
+  .sym-line{stroke:var(--ink);stroke-width:2;fill:none;stroke-linecap:round;}
+  .sym-body{stroke:var(--ink);stroke-width:2;fill:var(--panel);}
+  .sym-fill{fill:var(--ink);stroke:none;}
+  .dot{fill:var(--ink);stroke:none;}
+  .icbody{fill:#0b2743;stroke:var(--ink);stroke-width:2;}
+  .lbl{fill:var(--ink);font-family:var(--font-mono);font-size:12px;}
+  .lbl-dim{fill:var(--ink-dim);font-family:var(--font-mono);font-size:11px;}
+  .lbl-faint{fill:var(--ink-faint);font-family:var(--font-mono);font-size:10.5px;}
+  .lbl-power{fill:var(--power);}
+  .lbl-data{fill:var(--data);}
+  .lbl-sense{fill:var(--sense);}
+  .icname{fill:var(--ink);font-family:var(--font-sans);font-weight:600;font-size:14px;}
+  .offpage{fill:var(--panel);stroke-width:2;}
+  .offpage-power{stroke:var(--power);}
+  .offpage-data{stroke:var(--data);}
+  .offpage-sense{stroke:var(--sense);}
+
+  .notes{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px 22px;}
+  .notes li{font-size:13.5px;color:var(--ink-dim);}
+  .notes li b{color:var(--ink);font-weight:600;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  caption{text-align:left;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);margin-bottom:8px;letter-spacing:.02em;}
+  thead th{text-align:left;font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;padding:8px 10px;border-bottom:1px solid var(--panel-line);}
+  tbody td{padding:8px 10px;border-bottom:1px solid var(--panel-line);color:var(--ink-dim);font-variant-numeric:tabular-nums;}
+  tbody td:first-child{color:var(--ink);font-family:var(--font-mono);font-weight:600;white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  .tblwrap{overflow-x:auto;background:var(--panel);border:1px solid var(--panel-line);border-radius:4px;padding:16px;margin-top:14px;}
+
+  .callout{background:var(--panel);border:1px solid var(--panel-line);border-left:3px solid var(--sense);border-radius:0 4px 4px 0;padding:14px 16px;font-size:13.5px;color:var(--ink-dim);margin-top:16px;}
+  .callout b{color:var(--ink);}
+
+  footer{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:20px 40px;color:var(--ink-faint);font-family:var(--font-mono);font-size:11.5px;border-top:1px solid var(--panel-line);}
+
+  @media (max-width:640px){ .sheet-panel{padding:8px;} }
+</style>
+
+<header class="hero">
+  <p class="kicker">Drawing set &middot; 4 sheets + BOM</p>
+  <h1>Rudder angle indicator &mdash; full schematic</h1>
+  <p class="lede">ESP32-C3 + ADS1115, powered from a 12&ndash;24V DC bus through an LM2596 buck stage and an AMS1117-3.3 LDO, reading a ratiometric 0&ndash;360&deg; Hall-effect sensor with Kelvin-sensed supply/ground compensation.</p>
+  <div class="doc-meta">
+    <span><b>Project</b> RA-1 Rudder Angle Indicator</span>
+    <span><b>Rev</b> A</span>
+    <span><b>Sheets</b> 1&ndash;4 of 4</span>
+    <span><b>MCU</b> ESP32-C3</span>
+    <span><b>ADC</b> ADS1115</span>
+  </div>
+</header>
+
+<nav class="sheetnav" aria-label="Jump to sheet">
+  <div class="sheetnav-inner">
+    <a href="#legend">Legend</a>
+    <a href="#sheet1">Sheet 1 &middot; Power Input</a>
+    <a href="#sheet2">Sheet 2 &middot; 3.3V Rail</a>
+    <a href="#sheet3">Sheet 3 &middot; ESP32-C3</a>
+    <a href="#sheet4">Sheet 4 &middot; ADC &amp; Sensor</a>
+    <a href="#bom">Full BOM</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div id="legend">
+    <div class="legend">
+      <div class="legend-item"><span class="swatch" style="background:var(--ink)"></span>Ground / chassis common</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--power)"></span>DC power rail (input, +5V, +3V3)</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--data)"></span>Digital bus (I&sup2;C, ALERT)</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--sense)"></span>Analog sensor / Kelvin-sense line</div>
+    </div>
+    <div class="sym-key">
+      <span><b>&#9633;</b> resistor</span>
+      <span><b>&#9707;</b> capacitor</span>
+      <span><b>&#9654;&#124;</b> diode (bar = cathode)</span>
+      <span><b>&#9654;&#124;&#8264;</b> TVS / zener</span>
+      <span><b>&#9711;</b> junction (connected)</span>
+      <span><b>&#8916;</b> ground</span>
+      <span><b>&#11205;</b> off-page connector / net-name flag &mdash; same name = same net</span>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- SHEET 1 — POWER INPUT + LM2596 BUCK -->
+  <!-- ============================================================ -->
+  <section class="sheet" id="sheet1">
+    <div class="sheet-head">
+      <h2>Sheet 1 &mdash; Power input &amp; LM2596 buck (12/24V &rarr; 5V)</h2>
+      <span class="sheet-no">RA-1&ndash;01 &middot; Rev A</span>
+    </div>
+    <figure class="sheet-panel">
+      <svg viewBox="0 0 1080 480" role="img" aria-label="Schematic: DC input protection consisting of a fuse, a high-side P-channel MOSFET for reverse-polarity protection, a TVS diode clamp, and a bulk capacitor, feeding an LM2596 buck regulator that produces a regulated +5V rail with an output inductor, catch diode, output filter capacitors, and a feedback jumper wired to the true regulated output.">
+        <defs>
+          <pattern id="g1" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
+          <g id="s1-res-h"><line class="sym-line" x1="-34" y1="0" x2="-15" y2="0"/><rect class="sym-body" x="-15" y="-8" width="30" height="16"/><line class="sym-line" x1="15" y1="0" x2="34" y2="0"/></g>
+          <g id="s1-res-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-15"/><rect class="sym-body" x="-8" y="-15" width="16" height="30"/><line class="sym-line" x1="0" y1="15" x2="0" y2="34"/></g>
+          <g id="s1-cap-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-5"/><line class="sym-line" x1="-11" y1="-5" x2="11" y2="-5"/><line class="sym-line" x1="-11" y1="5" x2="11" y2="5"/><line class="sym-line" x1="0" y1="5" x2="0" y2="34"/></g>
+          <g id="s1-diode-catU"><line class="sym-line" x1="0" y1="30" x2="0" y2="8"/><polygon class="sym-fill" points="-8,8 8,8 0,-8"/><line class="sym-line" x1="-8" y1="-8" x2="8" y2="-8"/><line class="sym-line" x1="0" y1="-8" x2="0" y2="-30"/></g>
+          <g id="s1-zener-catU"><line class="sym-line" x1="0" y1="30" x2="0" y2="8"/><polygon class="sym-fill" points="-8,8 8,8 0,-8"/><line class="sym-line" x1="-8" y1="-8" x2="8" y2="-8"/><line class="sym-line" x1="-8" y1="-8" x2="-12" y2="-13"/><line class="sym-line" x1="8" y1="-8" x2="4" y2="-3"/><line class="sym-line" x1="0" y1="-8" x2="0" y2="-30"/></g>
+          <g id="s1-fuse-h"><line class="sym-line" x1="-34" y1="0" x2="-14" y2="0"/><ellipse class="sym-body" cx="0" cy="0" rx="14" ry="9"/><line class="sym-line" x1="-14" y1="0" x2="14" y2="0"/><line class="sym-line" x1="14" y1="0" x2="34" y2="0"/></g>
+          <g id="s1-ind-h"><path class="sym-line" d="M -34 0 H -24 A 8 8 0 0 1 -8 0 A 8 8 0 0 1 8 0 A 8 8 0 0 1 24 0 H 34"/></g>
+          <g id="s1-fet"><circle class="sym-body" cx="0" cy="0" r="19"/><line class="sym-line" x1="0" y1="19" x2="0" y2="40"/><line class="sym-line" x1="-19" y1="0" x2="-40" y2="0"/><line class="sym-line" x1="0" y1="-19" x2="0" y2="-40"/><path class="sym-line" d="M -7 8 L -1 0 L -7 -8" fill="none"/></g>
+          <g id="s1-gnd"><line class="sym-line" x1="0" y1="-16" x2="0" y2="0"/><line class="sym-line" x1="-13" y1="0" x2="13" y2="0"/><line class="sym-line" x1="-8" y1="6" x2="8" y2="6"/><line class="sym-line" x1="-4" y1="12" x2="4" y2="12"/></g>
+          <g id="s1-dot"><circle class="dot" cx="0" cy="0" r="3.2"/></g>
+          <g id="s1-flag-r"><polygon class="offpage" points="-30,-13 22,-13 36,0 22,13 -30,13"/></g>
+        </defs>
+        <rect width="1080" height="480" fill="url(#g1)"/>
+
+        <!-- J1 DC input connector -->
+        <rect class="sym-body" x="34" y="118" width="56" height="84"/>
+        <text class="lbl" x="62" y="112" text-anchor="middle">J1</text>
+        <text class="lbl-dim" x="62" y="216" text-anchor="middle">DC IN</text>
+        <text class="lbl-faint" x="62" y="146" text-anchor="middle">+</text>
+        <text class="lbl-faint" x="62" y="192" text-anchor="middle">&minus;</text>
+        <line class="wire wire-power" x1="90" y1="140" x2="150" y2="140"/>
+        <line class="wire" x1="90" y1="190" x2="110" y2="190"/>
+        <line class="wire" x1="110" y1="190" x2="110" y2="400"/>
+
+        <!-- +VBUS: fuse -->
+        <use href="#s1-fuse-h" x="200" y="140" class="wire-power"/>
+        <text class="lbl" x="200" y="112" text-anchor="middle">F1</text>
+        <text class="lbl-dim" x="200" y="168" text-anchor="middle">1A fast-blow</text>
+        <line class="wire wire-power" x1="234" y1="140" x2="300" y2="140"/>
+
+        <!-- Q1 reverse-polarity P-MOSFET -->
+        <use href="#s1-fet" x="340" y="140" class="wire-power"/>
+        <text class="lbl" x="340" y="88" text-anchor="middle">Q1</text>
+        <text class="lbl-dim" x="340" y="72" text-anchor="middle">P-CH MOSFET (reverse-polarity)</text>
+        <text class="lbl-faint" x="304" y="132" text-anchor="middle">S</text>
+        <text class="lbl-faint" x="376" y="132" text-anchor="middle">D</text>
+        <text class="lbl-faint" x="352" y="196" text-anchor="middle">G</text>
+        <line class="wire" x1="340" y1="180" x2="340" y2="226"/>
+        <use href="#s1-res-v" x="340" y="260"/>
+        <text class="lbl" x="368" y="256">R1</text>
+        <text class="lbl-dim" x="368" y="272">10k</text>
+        <line class="wire" x1="340" y1="294" x2="340" y2="400"/>
+        <use href="#s1-dot" x="340" y="400"/>
+
+        <line class="wire wire-power" x1="380" y1="140" x2="460" y2="140"/>
+        <use href="#s1-dot" x="460" y="140"/>
+
+        <!-- D1 TVS -->
+        <line class="wire wire-power" x1="460" y1="140" x2="460" y2="190"/>
+        <use href="#s1-zener-catU" x="460" y="220" class="wire-power"/>
+        <text class="lbl" x="490" y="196">D1</text>
+        <text class="lbl-dim" x="490" y="212">TVS 33V</text>
+        <line class="wire" x1="460" y1="250" x2="460" y2="400"/>
+        <use href="#s1-dot" x="460" y="400"/>
+
+        <line class="wire wire-power" x1="460" y1="140" x2="560" y2="140"/>
+        <use href="#s1-dot" x="560" y="140"/>
+
+        <!-- C1 bulk cap -->
+        <line class="wire wire-power" x1="560" y1="140" x2="560" y2="186"/>
+        <use href="#s1-cap-v" x="560" y="220"/>
+        <text class="lbl" x="590" y="196">C1</text>
+        <text class="lbl-dim" x="590" y="212">220&#181;F/50V</text>
+        <line class="wire" x1="560" y1="254" x2="560" y2="400"/>
+        <use href="#s1-dot" x="560" y="400"/>
+
+        <line class="wire wire-power" x1="560" y1="140" x2="700" y2="140"/>
+
+        <!-- U1 LM2596 -->
+        <rect class="icbody" x="700" y="90" width="150" height="150"/>
+        <text class="icname" x="775" y="75" text-anchor="middle">U1 &middot; LM2596-5.0</text>
+        <text class="lbl-faint" x="775" y="255" text-anchor="middle">buck regulator, TO-220-5 or module</text>
+        <text class="lbl-dim" x="710" y="135">VIN</text>
+        <text class="lbl-dim" x="710" y="175">GND</text>
+        <text class="lbl-dim" x="710" y="215">ON/OFF</text>
+        <text class="lbl-dim" x="840" y="135" text-anchor="end">OUTPUT</text>
+        <text class="lbl-dim" x="840" y="175" text-anchor="end">FEEDBACK</text>
+        <line class="wire" x1="670" y1="170" x2="700" y2="170"/>
+        <line class="wire" x1="670" y1="170" x2="670" y2="400"/>
+        <use href="#s1-dot" x="670" y="400"/>
+        <line class="wire" x1="760" y1="240" x2="760" y2="400"/>
+        <use href="#s1-dot" x="760" y="400"/>
+        <text class="lbl-faint" x="768" y="230">tie low = always on</text>
+
+        <!-- OUTPUT -> catch diode + inductor + output caps -->
+        <line class="wire wire-power" x1="850" y1="130" x2="900" y2="130"/>
+        <use href="#s1-dot" x="900" y="130"/>
+        <line class="wire wire-power" x1="900" y1="130" x2="900" y2="190"/>
+        <use href="#s1-diode-catU" x="900" y="220" class="wire-power"/>
+        <text class="lbl" x="930" y="196">D2</text>
+        <text class="lbl-dim" x="930" y="212">1N5822 Schottky</text>
+        <line class="wire" x1="900" y1="250" x2="900" y2="400"/>
+        <use href="#s1-dot" x="900" y="400"/>
+
+        <use href="#s1-ind-h" x="940" y="130" class="wire-power"/>
+        <text class="lbl" x="940" y="106" text-anchor="middle">L1</text>
+        <text class="lbl-dim" x="940" y="120" text-anchor="middle">33&ndash;68&#181;H</text>
+
+        <line class="wire wire-power" x1="974" y1="130" x2="1000" y2="130"/>
+        <use href="#s1-dot" x="1000" y="130"/>
+        <line class="wire wire-power" x1="1000" y1="130" x2="1000" y2="186"/>
+        <use href="#s1-cap-v" x="1000" y="220"/>
+        <text class="lbl" x="1000" y="256" text-anchor="middle">C2 / C2b</text>
+        <text class="lbl-dim" x="1000" y="270" text-anchor="middle">220&#181;F + 100nF</text>
+        <line class="wire" x1="1000" y1="254" x2="1000" y2="400"/>
+        <use href="#s1-dot" x="1000" y="400"/>
+
+        <!-- Feedback jumper: pin4 back to regulated output -->
+        <line class="wire wire-power" x1="850" y1="170" x2="870" y2="170"/>
+        <line class="wire wire-power" x1="870" y1="170" x2="870" y2="60"/>
+        <line class="wire wire-power" x1="870" y1="60" x2="1000" y2="60"/>
+        <line class="wire wire-power" x1="1000" y1="60" x2="1000" y2="130"/>
+        <text class="lbl-faint" x="935" y="52">FB jumper &mdash; senses true regulated output, not the switch node</text>
+
+        <!-- off-page +5V -->
+        <use href="#s1-flag-r" x="1035" y="130" class="offpage offpage-power"/>
+        <text class="lbl-power" x="1035" y="135" text-anchor="middle" font-family="var(--font-mono)" font-weight="700">+5V</text>
+        <text class="lbl-faint" x="1035" y="160" text-anchor="middle">&rarr; SHEET 2</text>
+
+        <!-- GND bus -->
+        <line class="wire" x1="110" y1="400" x2="1000" y2="400"/>
+        <use href="#s1-gnd" x="540" y="400"/>
+        <text class="lbl-faint" x="540" y="440" text-anchor="middle">GND</text>
+
+        <g class="titleblock">
+          <rect x="740" y="404" width="300" height="66"/>
+          <text x="750" y="420" class="tb-strong">RA-1 &middot; POWER INPUT</text>
+          <text x="750" y="436">SHEET 1 OF 4</text>
+          <text x="750" y="452">REV A</text>
+          <text x="940" y="436">SIZE A4</text>
+          <text x="940" y="452">SCALE NONE</text>
+        </g>
+      </svg>
+      <figcaption>Reverse-polarity P-MOSFET, fuse and TVS clamp protect the LM2596 buck stage; the feedback pin is jumpered to the true regulated output (after L1/C2), not the switching node.</figcaption>
+    </figure>
+
+    <ul class="notes">
+      <li><b>Q1 gate bias.</b> R1 pulls the gate toward GND relative to source, holding the P-MOSFET on under normal (correct) polarity; on a reverse connection the channel stays off. For 24V systems, consider adding a 15V zener from gate to source to clamp Vgs.</li>
+      <li><b>D1 TVS selection.</b> Use a 33V-clamp part (e.g. SMBJ33A) on 24V systems, or an 18V part on 12V-only systems &mdash; size it to survive alternator load-dump without clamping normal operating voltage.</li>
+      <li><b>L1 selection.</b> Pick inductance from the LM2596 datasheet's Vin/Vout/Iload chart; use a shielded type to limit radiated EMI near the analog front end on Sheet 4.</li>
+      <li><b>U1 package note.</b> Confirm exact pin numbering against the datasheet for your chosen package (TO-220-5 IC vs. a drop-in module).</li>
+    </ul>
+
+    <div class="tblwrap">
+      <table>
+        <caption>Sheet 1 &mdash; bill of materials</caption>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>J1</td><td>DC input connector</td><td>2-pin, 5.08mm terminal block</td><td>Rated &ge;3A</td></tr>
+          <tr><td>F1</td><td>Fuse</td><td>1A fast-blow (or PTC resettable)</td><td>In series with +VBUS</td></tr>
+          <tr><td>Q1</td><td>P-channel MOSFET</td><td>e.g. SI2333DDS</td><td>High-side reverse-polarity block</td></tr>
+          <tr><td>R1</td><td>Resistor</td><td>10k&#8486; 1/4W</td><td>Q1 gate pulldown</td></tr>
+          <tr><td>D1</td><td>TVS diode</td><td>SMBJ33A (24V) / SMBJ18A (12V)</td><td>Across +VBUS after F1</td></tr>
+          <tr><td>C1</td><td>Electrolytic cap</td><td>220&#181;F / 50V</td><td>Input bulk</td></tr>
+          <tr><td>U1</td><td>Buck regulator</td><td>LM2596-5.0</td><td>Fixed 5V output</td></tr>
+          <tr><td>L1</td><td>Power inductor</td><td>33&ndash;68&#181;H, shielded</td><td>Per LM2596 selection chart</td></tr>
+          <tr><td>D2</td><td>Schottky diode</td><td>1N5822 (3A/40V)</td><td>Buck catch diode</td></tr>
+          <tr><td>C2 / C2b</td><td>Output caps</td><td>220&#181;F/25V + 100nF ceramic</td><td>Low-ESR electrolytic</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SHEET 2 — AMS1117-3.3 + RAIL DISTRIBUTION -->
+  <!-- ============================================================ -->
+  <section class="sheet" id="sheet2">
+    <div class="sheet-head">
+      <h2>Sheet 2 &mdash; AMS1117-3.3 LDO &amp; rail distribution (5V &rarr; 3.3V)</h2>
+      <span class="sheet-no">RA-1&ndash;02 &middot; Rev A</span>
+    </div>
+    <figure class="sheet-panel">
+      <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: 5V rail from Sheet 1 feeding an AMS1117-3.3 linear regulator with input and output decoupling capacitors, producing a clean 3.3V rail that fans out to the ESP32-C3, the ADS1115, and the sensor supply on later sheets.">
+        <defs>
+          <pattern id="g2" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
+          <g id="s2-cap-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-5"/><line class="sym-line" x1="-11" y1="-5" x2="11" y2="-5"/><line class="sym-line" x1="-11" y1="5" x2="11" y2="5"/><line class="sym-line" x1="0" y1="5" x2="0" y2="34"/></g>
+          <g id="s2-gnd"><line class="sym-line" x1="0" y1="-16" x2="0" y2="0"/><line class="sym-line" x1="-13" y1="0" x2="13" y2="0"/><line class="sym-line" x1="-8" y1="6" x2="8" y2="6"/><line class="sym-line" x1="-4" y1="12" x2="4" y2="12"/></g>
+          <g id="s2-dot"><circle class="dot" cx="0" cy="0" r="3.2"/></g>
+          <g id="s2-flag-l"><polygon class="offpage" points="30,-13 -22,-13 -36,0 -22,13 30,13"/></g>
+          <g id="s2-flag-d"><polygon class="offpage" points="-24,-11 24,-11 24,6 0,20 -24,6"/></g>
+        </defs>
+        <rect width="1040" height="340" fill="url(#g2)"/>
+
+        <use href="#s2-flag-l" x="60" y="130" class="offpage offpage-power"/>
+        <text class="lbl-power" x="60" y="135" text-anchor="middle" font-family="var(--font-mono)" font-weight="700">+5V</text>
+        <text class="lbl-faint" x="60" y="105" text-anchor="middle">SHEET 1 &rarr;</text>
+
+        <line class="wire wire-power" x1="96" y1="130" x2="180" y2="130"/>
+        <use href="#s2-dot" x="180" y="130"/>
+        <line class="wire wire-power" x1="180" y1="130" x2="180" y2="196"/>
+        <use href="#s2-cap-v" x="180" y="230"/>
+        <text class="lbl" x="180" y="276" text-anchor="middle">C3</text>
+        <text class="lbl-dim" x="180" y="290" text-anchor="middle">10&#181;F</text>
+        <line class="wire" x1="180" y1="264" x2="180" y2="300"/>
+
+        <line class="wire wire-power" x1="180" y1="130" x2="260" y2="130"/>
+
+        <rect class="icbody" x="260" y="90" width="150" height="90"/>
+        <text class="icname" x="335" y="75" text-anchor="middle">U2 &middot; AMS1117-3.3</text>
+        <text class="lbl-faint" x="335" y="196" text-anchor="middle">SOT-223 LDO</text>
+        <text class="lbl-dim" x="270" y="115">VIN</text>
+        <text class="lbl-dim" x="270" y="150">GND</text>
+        <text class="lbl-dim" x="400" y="115" text-anchor="end">VOUT</text>
+        <line class="wire" x1="300" y1="180" x2="300" y2="300"/>
+
+        <line class="wire wire-power" x1="410" y1="105" x2="470" y2="105"/>
+        <use href="#s2-dot" x="470" y="105"/>
+        <line class="wire wire-power" x1="470" y1="105" x2="470" y2="196"/>
+        <use href="#s2-cap-v" x="470" y="230"/>
+        <text class="lbl" x="470" y="276" text-anchor="middle">C4 / C5</text>
+        <text class="lbl-dim" x="470" y="290" text-anchor="middle">22&#181;F + 100nF</text>
+        <line class="wire" x1="470" y1="264" x2="470" y2="300"/>
+
+        <line class="wire wire-power" x1="470" y1="105" x2="560" y2="105"/>
+        <use href="#s2-dot" x="560" y="105"/>
+        <line class="wire wire-power" x1="560" y1="105" x2="560" y2="196"/>
+        <use href="#s2-cap-v" x="560" y="230"/>
+        <text class="lbl" x="560" y="276" text-anchor="middle">C6</text>
+        <text class="lbl-dim" x="560" y="290" text-anchor="middle">100&ndash;220&#181;F</text>
+        <line class="wire" x1="560" y1="264" x2="560" y2="300"/>
+        <text class="lbl-faint" x="560" y="65" text-anchor="middle">bulk, near ESP32-C3</text>
+
+        <line class="wire wire-power" x1="560" y1="105" x2="960" y2="105"/>
+
+        <line class="wire wire-power" x1="680" y1="105" x2="680" y2="150"/>
+        <use href="#s2-flag-d" x="680" y="170" class="offpage offpage-power"/>
+        <text class="lbl-power" x="680" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
+        <text class="lbl-faint" x="680" y="205" text-anchor="middle">&rarr; SHEET 3 (ESP32-C3)</text>
+
+        <line class="wire wire-power" x1="820" y1="105" x2="820" y2="150"/>
+        <use href="#s2-flag-d" x="820" y="170" class="offpage offpage-power"/>
+        <text class="lbl-power" x="820" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
+        <text class="lbl-faint" x="820" y="205" text-anchor="middle">&rarr; SHEET 4 (ADS1115 VDD)</text>
+
+        <line class="wire wire-power" x1="960" y1="105" x2="960" y2="150"/>
+        <use href="#s2-flag-d" x="960" y="170" class="offpage offpage-power"/>
+        <text class="lbl-power" x="960" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
+        <text class="lbl-faint" x="960" y="205" text-anchor="middle">&rarr; SHEET 4 (sensor supply)</text>
+
+        <line class="wire" x1="180" y1="300" x2="960" y2="300"/>
+        <use href="#s2-gnd" x="560" y="300"/>
+        <text class="lbl-faint" x="560" y="335" text-anchor="middle">GND</text>
+      </svg>
+      <figcaption>Cascading buck&rarr;LDO keeps LM2596 switching ripple off the 3.3V analog/logic rail; C6 supplies the fast Wi-Fi TX current transients the LDO alone can't slew for.</figcaption>
+    </figure>
+
+    <ul class="notes">
+      <li><b>Why not run the LM2596 straight to 3.3V?</b> The AMS1117's high PSRR filters the buck's switching ripple before it reaches the 16-bit ADC reference &mdash; important given the sub-mV resolution you're after.</li>
+      <li><b>Thermal.</b> At ~0.5A total 3.3V load, U2 dissipates roughly (5V&minus;3.3V)&times;0.5A &asymp; 0.85W &mdash; give the SOT-223 tab copper pour, don't bury it under other parts.</li>
+    </ul>
+
+    <div class="tblwrap">
+      <table>
+        <caption>Sheet 2 &mdash; bill of materials</caption>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>C3</td><td>Input cap</td><td>10&#181;F tantalum/ceramic</td><td>At U2 VIN</td></tr>
+          <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>SOT-223</td></tr>
+          <tr><td>C4 / C5</td><td>Output caps</td><td>22&#181;F tantalum + 100nF ceramic</td><td>Required for LDO stability</td></tr>
+          <tr><td>C6</td><td>Bulk cap</td><td>100&ndash;220&#181;F low-ESR</td><td>At ESP32-C3 3V3 pin</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SHEET 3 — ESP32-C3 -->
+  <!-- ============================================================ -->
+  <section class="sheet" id="sheet3">
+    <div class="sheet-head">
+      <h2>Sheet 3 &mdash; ESP32-C3 module</h2>
+      <span class="sheet-no">RA-1&ndash;03 &middot; Rev A</span>
+    </div>
+    <figure class="sheet-panel">
+      <svg viewBox="0 0 1040 440" role="img" aria-label="Schematic: ESP32-C3 module with 3.3V decoupling, an EN reset-delay network, a GPIO9 boot-mode pull-up, and I2C SDA/SCL plus an ALERT interrupt line routed off-page to the ADS1115 sheet.">
+        <defs>
+          <pattern id="g3" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
+          <g id="s3-res-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-15"/><rect class="sym-body" x="-8" y="-15" width="16" height="30"/><line class="sym-line" x1="0" y1="15" x2="0" y2="34"/></g>
+          <g id="s3-cap-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-5"/><line class="sym-line" x1="-11" y1="-5" x2="11" y2="-5"/><line class="sym-line" x1="-11" y1="5" x2="11" y2="5"/><line class="sym-line" x1="0" y1="5" x2="0" y2="34"/></g>
+          <g id="s3-gnd"><line class="sym-line" x1="0" y1="-16" x2="0" y2="0"/><line class="sym-line" x1="-13" y1="0" x2="13" y2="0"/><line class="sym-line" x1="-8" y1="6" x2="8" y2="6"/><line class="sym-line" x1="-4" y1="12" x2="4" y2="12"/></g>
+          <g id="s3-dot"><circle class="dot" cx="0" cy="0" r="3.2"/></g>
+          <g id="s3-flag-u"><polygon class="offpage" points="-13,24 -13,-24 0,-38 13,-24 13,24"/></g>
+          <g id="s3-flag-r"><polygon class="offpage" points="-30,-13 22,-13 36,0 22,13 -30,13"/></g>
+        </defs>
+        <rect width="1040" height="440" fill="url(#g3)"/>
+
+        <use href="#s3-flag-u" x="140" y="60" class="offpage offpage-power"/>
+        <text class="lbl-power" x="140" y="64" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
+        <text class="lbl-faint" x="140" y="30" text-anchor="middle">SHEET 2 &rarr;</text>
+        <line class="wire wire-power" x1="140" y1="98" x2="140" y2="145"/>
+        <line class="wire wire-power" x1="140" y1="145" x2="300" y2="145"/>
+        <use href="#s3-dot" x="140" y="145"/>
+
+        <line class="wire wire-power" x1="140" y1="145" x2="140" y2="176"/>
+        <use href="#s3-cap-v" x="140" y="210"/>
+        <text class="lbl" x="108" y="206" text-anchor="end">C7/C8</text>
+        <text class="lbl-dim" x="108" y="220" text-anchor="end">10&#181;F+100nF</text>
+        <line class="wire" x1="140" y1="244" x2="140" y2="400"/>
+
+        <!-- EN network -->
+        <line class="wire wire-power" x1="140" y1="145" x2="230" y2="145"/>
+        <line class="wire wire-power" x1="230" y1="145" x2="230" y2="146"/>
+        <use href="#s3-res-v" x="230" y="180"/>
+        <text class="lbl" x="258" y="176">R2</text>
+        <text class="lbl-dim" x="258" y="192">10k</text>
+        <line class="wire" x1="230" y1="145" x2="230" y2="146"/>
+        <line class="wire wire-power" x1="140" y1="145" x2="140" y2="145"/>
+        <line class="wire" x1="230" y1="214" x2="230" y2="240"/>
+        <line class="wire" x1="230" y1="240" x2="300" y2="240"/>
+        <use href="#s3-cap-v" x="230" y="280"/>
+        <text class="lbl" x="258" y="276">C9</text>
+        <text class="lbl-dim" x="258" y="290">1&#181;F</text>
+        <text class="lbl-faint" x="258" y="304">EN power-on delay</text>
+        <line class="wire" x1="230" y1="240" x2="230" y2="246"/>
+        <line class="wire" x1="230" y1="314" x2="230" y2="400"/>
+
+        <!-- GPIO9 boot strap -->
+        <line class="wire wire-power" x1="270" y1="145" x2="270" y2="146"/>
+        <use href="#s3-res-v" x="270" y="180"/>
+        <text class="lbl" x="298" y="176">R3</text>
+        <text class="lbl-dim" x="298" y="192">10k</text>
+        <line class="wire wire-power" x1="230" y1="146" x2="270" y2="146"/>
+        <line class="wire" x1="270" y1="214" x2="270" y2="280"/>
+        <line class="wire" x1="270" y1="280" x2="300" y2="280"/>
+
+        <!-- ESP32-C3 body -->
+        <rect class="icbody" x="300" y="120" width="220" height="280"/>
+        <text class="icname" x="410" y="102" text-anchor="middle">U3 &middot; ESP32-C3</text>
+        <text class="lbl-faint" x="410" y="418" text-anchor="middle">module &mdash; devkit: feed 3V3 pin directly, bypass onboard LDO</text>
+        <text class="lbl-dim" x="310" y="165">3V3</text>
+        <text class="lbl-dim" x="310" y="205">EN</text>
+        <text class="lbl-dim" x="310" y="245">GPIO9 (BOOT)</text>
+        <text class="lbl-dim" x="310" y="285">GPIO_ALERT-IN</text>
+        <text class="lbl-dim" x="310" y="380">GND</text>
+        <text class="lbl-data" x="510" y="300" text-anchor="end">SDA (GPIOx)</text>
+        <text class="lbl-data" x="510" y="340" text-anchor="end">SCL (GPIOy)</text>
+        <text class="lbl-sense" x="510" y="380" text-anchor="end">ALERT (GPIOz)</text>
+
+        <line class="wire" x1="230" y1="400" x2="520" y2="400"/>
+        <line class="wire" x1="140" y1="400" x2="230" y2="400"/>
+        <use href="#s3-gnd" x="360" y="400"/>
+        <text class="lbl-faint" x="360" y="432" text-anchor="middle">GND</text>
+
+        <line class="wire wire-data" x1="520" y1="300" x2="620" y2="300"/>
+        <use href="#s3-flag-r" x="660" y="300" class="offpage offpage-data"/>
+        <text class="lbl-data" x="655" y="305" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">SDA</text>
+
+        <line class="wire wire-data" x1="520" y1="340" x2="620" y2="340"/>
+        <use href="#s3-flag-r" x="660" y="340" class="offpage offpage-data"/>
+        <text class="lbl-data" x="655" y="345" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">SCL</text>
+
+        <line class="wire wire-sense" x1="520" y1="380" x2="620" y2="380"/>
+        <use href="#s3-flag-r" x="660" y="380" class="offpage offpage-sense"/>
+        <text class="lbl-sense" x="655" y="385" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">ALRT</text>
+        <text class="lbl-faint" x="660" y="410" text-anchor="middle">&rarr; SHEET 4 (ADS1115)</text>
+        <text class="lbl-faint" x="655" y="270" text-anchor="middle">&rarr; SHEET 4 (I&sup2;C bus)</text>
+      </svg>
+      <figcaption>Avoid GPIO9 and other strapping pins for anything but their boot-mode role; route SDA/SCL/ALERT to pins your specific module doesn't reserve.</figcaption>
+    </figure>
+
+    <ul class="notes">
+      <li><b>Bare module vs. devkit.</b> A bare ESP32-C3 module needs the full decoupling/strapping shown; a devkit already has most of this on-board &mdash; feed its 3V3 pin directly from Sheet 2 and skip R2/C9/R3 if so.</li>
+      <li><b>ALERT/RDY.</b> Wiring the ADS1115's ALERT pin to a spare GPIO lets firmware wait on conversion-ready via interrupt instead of a fixed polling delay across 4 channels.</li>
+    </ul>
+
+    <div class="tblwrap">
+      <table>
+        <caption>Sheet 3 &mdash; bill of materials</caption>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>U3</td><td>MCU module</td><td>ESP32-C3 (bare or devkit)</td><td>&mdash;</td></tr>
+          <tr><td>R2</td><td>Resistor</td><td>10k&#8486;</td><td>EN pull-up</td></tr>
+          <tr><td>C7 / C8</td><td>Decoupling caps</td><td>10&#181;F + 100nF</td><td>At 3V3 pin</td></tr>
+          <tr><td>C9</td><td>Capacitor</td><td>1&#181;F</td><td>EN power-on delay</td></tr>
+          <tr><td>R3</td><td>Resistor</td><td>10k&#8486;</td><td>GPIO9 (BOOT) pull-up</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- SHEET 4 — ADS1115 + SENSOR INTERFACE -->
+  <!-- ============================================================ -->
+  <section class="sheet" id="sheet4">
+    <div class="sheet-head">
+      <h2>Sheet 4 &mdash; ADS1115 &amp; sensor interface</h2>
+      <span class="sheet-no">RA-1&ndash;04 &middot; Rev A</span>
+    </div>
+    <figure class="sheet-panel">
+      <svg viewBox="0 0 1160 1140" role="img" aria-label="Schematic: ADS1115 ADC with I2C pull-ups and ADDR tied low, four identical RC anti-alias filter and dual diode clamp networks on AIN0 through AIN3, a five-pin Kelvin-sense connector to the rudder angle sensor, and a two-pin connector to the floating sensor.">
+        <defs>
+          <pattern id="g4" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
+          <g id="s4-res-h"><line class="sym-line" x1="-34" y1="0" x2="-15" y2="0"/><rect class="sym-body" x="-15" y="-8" width="30" height="16"/><line class="sym-line" x1="15" y1="0" x2="34" y2="0"/></g>
+          <g id="s4-res-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-15"/><rect class="sym-body" x="-8" y="-15" width="16" height="30"/><line class="sym-line" x1="0" y1="15" x2="0" y2="34"/></g>
+          <g id="s4-cap-sm"><line class="sym-line" x1="0" y1="-16" x2="0" y2="-4"/><line class="sym-line" x1="-7" y1="-4" x2="7" y2="-4"/><line class="sym-line" x1="-7" y1="4" x2="7" y2="4"/><line class="sym-line" x1="0" y1="4" x2="0" y2="16"/></g>
+          <g id="s4-diode-sm-catU"><line class="sym-line" x1="0" y1="16" x2="0" y2="5"/><polygon class="sym-fill" points="-6,5 6,5 0,-5"/><line class="sym-line" x1="-6" y1="-5" x2="6" y2="-5"/><line class="sym-line" x1="0" y1="-5" x2="0" y2="-16"/></g>
+          <g id="s4-gnd"><line class="sym-line" x1="0" y1="-13" x2="0" y2="0"/><line class="sym-line" x1="-10" y1="0" x2="10" y2="0"/><line class="sym-line" x1="-6" y1="5" x2="6" y2="5"/><line class="sym-line" x1="-3" y1="10" x2="3" y2="10"/></g>
+          <g id="s4-dot"><circle class="dot" cx="0" cy="0" r="3"/></g>
+          <g id="s4-flag-l"><polygon class="offpage" points="26,-11 -20,-11 -32,0 -20,11 26,11"/></g>
+          <g id="s4-flag-u-sm"><polygon class="offpage" points="-8,14 -8,-14 0,-22 8,-14 8,14"/></g>
+        </defs>
+        <rect width="1160" height="1140" fill="url(#g4)"/>
+
+        <!-- incoming +3V3 -->
+        <use href="#s4-flag-l" x="70" y="60" class="offpage offpage-power"/>
+        <text class="lbl-power" x="70" y="64" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
+        <text class="lbl-faint" x="70" y="34" text-anchor="middle">SHEET 2 &rarr;</text>
+        <line class="wire wire-power" x1="102" y1="60" x2="1060" y2="60"/>
+
+        <!-- SDA/SCL/ALERT incoming -->
+        <use href="#s4-flag-l" x="70" y="110" class="offpage offpage-data"/>
+        <text class="lbl-data" x="70" y="114" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">SDA</text>
+        <use href="#s4-flag-l" x="70" y="150" class="offpage offpage-data"/>
+        <text class="lbl-data" x="70" y="154" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">SCL</text>
+        <use href="#s4-flag-l" x="70" y="190" class="offpage offpage-sense"/>
+        <text class="lbl-sense" x="70" y="194" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="9">ALRT</text>
+        <text class="lbl-faint" x="70" y="220" text-anchor="middle">SHEET 3</text>
+
+        <!-- I2C pull-ups -->
+        <use href="#s4-res-v" x="270" y="60"/>
+        <text class="lbl-faint" x="270" y="20" text-anchor="middle">R4 4.7k</text>
+        <use href="#s4-res-v" x="310" y="60"/>
+        <text class="lbl-faint" x="310" y="20" text-anchor="middle">R5 4.7k</text>
+        <line class="wire wire-power" x1="270" y1="60" x2="270" y2="60"/>
+        <line class="wire wire-data" x1="270" y1="94" x2="270" y2="110"/>
+        <line class="wire wire-data" x1="102" y1="110" x2="270" y2="110"/>
+        <line class="wire wire-data" x1="310" y1="94" x2="310" y2="150"/>
+        <line class="wire wire-data" x1="102" y1="150" x2="310" y2="150"/>
+        <line class="wire wire-sense" x1="102" y1="190" x2="380" y2="190"/>
+
+        <!-- ADS1115 body (tall — right-side pins align to the four AIN lanes below) -->
+        <rect class="icbody" x="380" y="90" width="220" height="880"/>
+        <text class="icname" x="490" y="72" text-anchor="middle">U4 &middot; ADS1115</text>
+        <text class="lbl-faint" x="490" y="990" text-anchor="middle">16-bit ADC, I&sup2;C &mdash; confirm pin numbers against datasheet package</text>
+        <text class="lbl-dim" x="390" y="135">VDD</text>
+        <text class="lbl-dim" x="390" y="230">ADDR</text>
+        <text class="lbl-data" x="390" y="270">SCL</text>
+        <text class="lbl-data" x="390" y="310">SDA</text>
+        <text class="lbl-sense" x="390" y="350">ALERT/RDY</text>
+        <text class="lbl-sense" x="590" y="185" text-anchor="end">AIN0</text>
+        <text class="lbl-sense" x="590" y="425" text-anchor="end">AIN1</text>
+        <text class="lbl-sense" x="590" y="665" text-anchor="end">AIN2</text>
+        <text class="lbl-sense" x="590" y="905" text-anchor="end">AIN3</text>
+
+        <line class="wire wire-power" x1="440" y1="60" x2="440" y2="90"/>
+        <use href="#s4-dot" x="440" y="60"/>
+        <line class="wire wire-power" x1="440" y1="135" x2="440" y2="146"/>
+        <use href="#s4-cap-sm" x="440" y="162"/>
+        <text class="lbl-faint" x="440" y="196" text-anchor="middle">C10 0.1&#181;F</text>
+        <line class="wire" x1="440" y1="178" x2="440" y2="990"/>
+
+        <line class="wire wire-data" x1="270" y1="110" x2="380" y2="270"/>
+        <line class="wire wire-data" x1="310" y1="150" x2="380" y2="310"/>
+        <line class="wire" x1="380" y1="230" x2="330" y2="230"/>
+        <line class="wire" x1="330" y1="230" x2="330" y2="990"/>
+        <text class="lbl-faint" x="330" y="215" text-anchor="middle">ADDR&rarr;GND (0x48)</text>
+        <line class="wire wire-sense" x1="102" y1="190" x2="380" y2="350"/>
+
+        <line class="wire" x1="270" y1="990" x2="440" y2="990"/>
+        <use href="#s4-gnd" x="360" y="990"/>
+        <text class="lbl-faint" x="360" y="1015" text-anchor="middle">GND</text>
+
+        <!-- ===== 4x identical AINx front ends, 240px pitch ===== -->
+        <!-- AIN0 y=190 -->
+        <line class="wire wire-sense" x1="600" y1="185" x2="660" y2="185"/>
+        <use href="#s4-res-h" x="700" y="185" class="wire-sense"/>
+        <text class="lbl-faint" x="700" y="162" text-anchor="middle">R6 10k</text>
+        <line class="wire wire-sense" x1="734" y1="185" x2="740" y2="185"/>
+        <use href="#s4-flag-u-sm" x="740" y="100" class="offpage offpage-power"/>
+        <text class="lbl-power" x="740" y="80" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">+3V3</text>
+        <line class="wire wire-power" x1="740" y1="114" x2="740" y2="125"/>
+        <use href="#s4-diode-sm-catU" x="740" y="141" class="wire-power"/>
+        <line class="wire" x1="740" y1="157" x2="740" y2="185"/>
+        <line class="wire" x1="740" y1="185" x2="740" y2="199"/>
+        <use href="#s4-cap-sm" x="740" y="215"/>
+        <text class="lbl-faint" x="762" y="219">C11 1&#181;F</text>
+        <line class="wire" x1="740" y1="231" x2="740" y2="247"/>
+        <use href="#s4-diode-sm-catU" x="740" y="263"/>
+        <line class="wire" x1="740" y1="279" x2="740" y2="290"/>
+        <use href="#s4-gnd" x="740" y="290"/>
+        <line class="wire wire-sense" x1="740" y1="185" x2="1000" y2="185"/>
+        <text class="lbl-sense" x="900" y="172" text-anchor="middle">AIN0 &middot; RUDDER ANGLE SIGNAL</text>
+
+        <!-- AIN1 y=430 -->
+        <line class="wire wire-sense" x1="600" y1="425" x2="660" y2="425"/>
+        <use href="#s4-res-h" x="700" y="425" class="wire-sense"/>
+        <text class="lbl-faint" x="700" y="402" text-anchor="middle">R7 10k</text>
+        <line class="wire wire-sense" x1="734" y1="425" x2="740" y2="425"/>
+        <use href="#s4-flag-u-sm" x="740" y="340" class="offpage offpage-power"/>
+        <text class="lbl-power" x="740" y="320" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">+3V3</text>
+        <line class="wire wire-power" x1="740" y1="354" x2="740" y2="365"/>
+        <use href="#s4-diode-sm-catU" x="740" y="381" class="wire-power"/>
+        <line class="wire" x1="740" y1="397" x2="740" y2="425"/>
+        <line class="wire" x1="740" y1="425" x2="740" y2="439"/>
+        <use href="#s4-cap-sm" x="740" y="455"/>
+        <text class="lbl-faint" x="762" y="459">C12 1&#181;F</text>
+        <line class="wire" x1="740" y1="471" x2="740" y2="487"/>
+        <use href="#s4-diode-sm-catU" x="740" y="503"/>
+        <line class="wire" x1="740" y1="519" x2="740" y2="530"/>
+        <use href="#s4-gnd" x="740" y="530"/>
+        <line class="wire wire-sense" x1="740" y1="425" x2="1000" y2="425"/>
+        <text class="lbl-sense" x="900" y="412" text-anchor="middle">AIN1 &middot; FLOATING SENSOR SIGNAL</text>
+
+        <!-- AIN2 y=670 : sensor supply Kelvin sense -->
+        <line class="wire wire-sense" x1="600" y1="665" x2="660" y2="665"/>
+        <use href="#s4-res-h" x="700" y="665" class="wire-sense"/>
+        <text class="lbl-faint" x="700" y="642" text-anchor="middle">R8 10k</text>
+        <line class="wire wire-sense" x1="734" y1="665" x2="740" y2="665"/>
+        <line class="wire" x1="740" y1="665" x2="740" y2="679"/>
+        <use href="#s4-cap-sm" x="740" y="695"/>
+        <text class="lbl-faint" x="762" y="699">C13 1&#181;F</text>
+        <line class="wire" x1="740" y1="711" x2="740" y2="727"/>
+        <use href="#s4-diode-sm-catU" x="740" y="743"/>
+        <line class="wire" x1="740" y1="759" x2="740" y2="770"/>
+        <use href="#s4-gnd" x="740" y="770"/>
+        <line class="wire wire-sense" x1="740" y1="665" x2="1000" y2="665"/>
+        <text class="lbl-sense" x="900" y="652" text-anchor="middle">AIN2 &middot; SENSOR SUPPLY SENSE (Kelvin)</text>
+
+        <!-- AIN3 y=910 : sensor ground Kelvin sense — no tie to system GND bus -->
+        <line class="wire wire-sense" x1="600" y1="905" x2="660" y2="905"/>
+        <use href="#s4-res-h" x="700" y="905" class="wire-sense"/>
+        <text class="lbl-faint" x="700" y="882" text-anchor="middle">R9 10k</text>
+        <line class="wire wire-sense" x1="734" y1="905" x2="740" y2="905"/>
+        <line class="wire" x1="740" y1="905" x2="740" y2="919"/>
+        <use href="#s4-cap-sm" x="740" y="935"/>
+        <text class="lbl-faint" x="762" y="939">C14 1&#181;F</text>
+        <text class="lbl-faint" x="740" y="975" text-anchor="middle">clamps only outside normal range &mdash;</text>
+        <text class="lbl-faint" x="740" y="990" text-anchor="middle">does not tie this line to GND otherwise</text>
+        <line class="wire wire-sense" x1="740" y1="905" x2="1000" y2="905"/>
+        <text class="lbl-sense" x="900" y="892" text-anchor="middle">AIN3 &middot; SENSOR GROUND SENSE (Kelvin, floating)</text>
+
+        <text class="lbl-faint" x="900" y="1055" text-anchor="middle">clamp diode pairs D3&ndash;D10: BAT54S dual packages (one +3V3 leg / one GND leg per channel, as drawn for AIN0/AIN1)</text>
+
+        <!-- J2 sensor connector -->
+        <rect class="sym-body" x="1000" y="90" width="90" height="880"/>
+        <text class="lbl" x="1045" y="76" text-anchor="middle">J2 &middot; RUDDER SENSOR</text>
+        <text class="lbl-faint" x="1045" y="990" text-anchor="middle">5-pin, shielded twisted-pair cable</text>
+        <text class="lbl-faint" x="970" y="65" text-anchor="end">SUPPLY</text>
+        <line class="wire wire-power" x1="1000" y1="60" x2="1030" y2="60"/>
+        <line class="wire wire-power" x1="1030" y1="60" x2="1030" y2="90"/>
+        <text class="lbl-faint" x="970" y="190" text-anchor="end">GND (return)</text>
+        <line class="wire" x1="1000" y1="230" x2="960" y2="230"/>
+        <line class="wire" x1="960" y1="230" x2="960" y2="1060"/>
+        <use href="#s4-gnd" x="960" y="1060"/>
+
+        <g class="titleblock">
+          <rect x="820" y="1070" width="240" height="60"/>
+          <text x="830" y="1086" class="tb-strong">RA-1 &middot; ADC + SENSOR</text>
+          <text x="830" y="1102" >SHEET 4 OF 4</text>
+          <text x="830" y="1118">REV A</text>
+          <text x="980" y="1102">SIZE A3</text>
+          <text x="980" y="1118">SCALE NONE</text>
+        </g>
+        <text class="lbl-faint" x="80" y="1085">Firmware: angle_ratio = (AIN0 &minus; AIN3) &divide; (AIN2 &minus; AIN3)</text>
+        <text class="lbl-faint" x="80" y="1103">&mdash; cancels regulator drift and cable IR drop using the two Kelvin-sense channels.</text>
+      </svg>
+      <figcaption>All four ADC channels share one RC anti-alias filter + dual-diode clamp topology (drawn in full on AIN0/AIN1; AIN2/AIN3 repeat it identically). AIN2/AIN3 are wired as true Kelvin sense lines back to the sensor's own supply/ground pins &mdash; a 5-conductor cable, not 3.</figcaption>
+    </figure>
+
+    <ul class="notes">
+      <li><b>Gain.</b> Set the ADS1115 PGA to &plusmn;4.096V (gain=1) on every channel &mdash; comfortably covers 0&ndash;3.3V with ~125&#181;V/step resolution.</li>
+      <li><b>Mux settling.</b> Discard the first conversion after each channel switch; the ADS1115 has one ADC core behind a single mux.</li>
+      <li><b>J2 wiring is the key design choice.</b> If a 5-conductor run to the sensor isn't practical, AIN2/AIN3 can instead tap the local 3.3V rail and local GND at the enclosure &mdash; still catches regulator drift, but not cable drop.</li>
+      <li><b>Cable practice.</b> Twisted pair per signal+return, overall shield grounded at the electronics end only, routed clear of the LM2596 switching loop on Sheet 1.</li>
+    </ul>
+
+    <div class="tblwrap">
+      <table>
+        <caption>Sheet 4 &mdash; bill of materials</caption>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>U4</td><td>16-bit ADC</td><td>ADS1115</td><td>I&sup2;C, 4 single-ended channels</td></tr>
+          <tr><td>R4 / R5</td><td>I&sup2;C pull-ups</td><td>4.7k&#8486;</td><td>Omit if breakout already has them</td></tr>
+          <tr><td>C10</td><td>Decoupling cap</td><td>0.1&#181;F</td><td>At U4 VDD</td></tr>
+          <tr><td>R6&ndash;R9</td><td>Series filter resistors</td><td>10k&#8486; &times;4</td><td>One per AINx</td></tr>
+          <tr><td>C11&ndash;C14</td><td>Filter caps</td><td>1&#181;F &times;4</td><td>~16Hz anti-alias, one per AINx</td></tr>
+          <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4 packages</td><td>ESD/transient protection, one per AINx</td></tr>
+          <tr><td>J2</td><td>Sensor connector</td><td>5-pin</td><td>Supply, Sig, +Sense, GND, &minus;Sense</td></tr>
+          <tr><td>J3</td><td>Floating sensor connector</td><td>2-pin</td><td>Sig, GND</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- CONSOLIDATED BOM -->
+  <!-- ============================================================ -->
+  <section class="sheet" id="bom">
+    <div class="sheet-head">
+      <h2>Full bill of materials</h2>
+      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev A</span>
+    </div>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Sheet</th></tr></thead>
+        <tbody>
+          <tr><td>J1</td><td>DC input connector</td><td>2-pin terminal block</td><td>1</td></tr>
+          <tr><td>F1</td><td>Fuse</td><td>1A fast-blow</td><td>1</td></tr>
+          <tr><td>Q1</td><td>P-channel MOSFET</td><td>SI2333DDS or equiv.</td><td>1</td></tr>
+          <tr><td>R1</td><td>Resistor</td><td>10k&#8486;</td><td>1</td></tr>
+          <tr><td>D1</td><td>TVS diode</td><td>SMBJ33A / SMBJ18A</td><td>1</td></tr>
+          <tr><td>C1</td><td>Electrolytic cap</td><td>220&#181;F/50V</td><td>1</td></tr>
+          <tr><td>U1</td><td>Buck regulator</td><td>LM2596-5.0</td><td>1</td></tr>
+          <tr><td>L1</td><td>Power inductor</td><td>33&ndash;68&#181;H</td><td>1</td></tr>
+          <tr><td>D2</td><td>Schottky diode</td><td>1N5822</td><td>1</td></tr>
+          <tr><td>C2/C2b</td><td>Output caps</td><td>220&#181;F + 100nF</td><td>1</td></tr>
+          <tr><td>C3</td><td>Input cap</td><td>10&#181;F</td><td>2</td></tr>
+          <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>2</td></tr>
+          <tr><td>C4/C5</td><td>Output caps</td><td>22&#181;F + 100nF</td><td>2</td></tr>
+          <tr><td>C6</td><td>Bulk cap</td><td>100&ndash;220&#181;F</td><td>2</td></tr>
+          <tr><td>U3</td><td>MCU module</td><td>ESP32-C3</td><td>3</td></tr>
+          <tr><td>R2/R3</td><td>Resistors</td><td>10k&#8486; &times;2</td><td>3</td></tr>
+          <tr><td>C7/C8/C9</td><td>Capacitors</td><td>10&#181;F, 100nF, 1&#181;F</td><td>3</td></tr>
+          <tr><td>U4</td><td>16-bit ADC</td><td>ADS1115</td><td>4</td></tr>
+          <tr><td>R4/R5</td><td>I&sup2;C pull-ups</td><td>4.7k&#8486; &times;2</td><td>4</td></tr>
+          <tr><td>R6&ndash;R9</td><td>Filter resistors</td><td>10k&#8486; &times;4</td><td>4</td></tr>
+          <tr><td>C10</td><td>Decoupling cap</td><td>0.1&#181;F</td><td>4</td></tr>
+          <tr><td>C11&ndash;C14</td><td>Filter caps</td><td>1&#181;F &times;4</td><td>4</td></tr>
+          <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4</td><td>4</td></tr>
+          <tr><td>J2</td><td>Sensor connector</td><td>5-pin</td><td>4</td></tr>
+          <tr><td>J3</td><td>Floating sensor connector</td><td>2-pin</td><td>4</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <b>Before you lay this out:</b> confirm exact pin numbering for U1, U2, U3, U4 against the datasheet for the specific package/module you buy &mdash; this drawing set fixes pin <i>function</i> and net topology, which is what the electrical design depends on; physical pin numbers are a footprint detail you'll cross-reference during PCB layout.
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  RA-1 Rudder Angle Indicator &middot; Rev A &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
+</footer>
