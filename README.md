@@ -1,2 +1,11 @@
 # RudderAngleIndicator-ESP32C3-ADS1115-AngleSensor-Circuit
-I’ll now explain my full rudder angle indicator design to you. I’m using the ESP32-C3 series. I use an external ADC, the ADS1115. I use a Hall effect angle sensor, which works from 0 to 360 degrees, and the voltage varies from 0 to 3.3 volts. This is my main setup. I will provide an input of 12v or 24v, so I will use the LM2596 regulator to output 3.3v or 5v volts as needed. Wherever I need 3.3v, I plan to use an AMS1117-3.3 voltage regulator. If there are any filter circuits or anything else, provide those as well. For the ADC, I have four channels. I will use channel AIN0 for the rudder angle. I will use channel AIN1 for a floating sensor. I will use channel AIN2 and AIN3 to measure what voltage is actually going to the sensor, meaning the supply and ground readings. This is my whole design. 
+
+Rudder angle indicator built around an ESP32-C3, an ADS1115 external ADC, and a 0–360° Hall-effect angle sensor (ratiometric 0–3.3V output), powered from a 12V/24V DC marine bus via LM2596 (buck) → AMS1117-3.3 (LDO).
+
+ADC channel assignment:
+- **AIN0** — rudder angle sensor signal
+- **AIN1** — floating sensor
+- **AIN2** — sensor supply sense (Kelvin)
+- **AIN3** — sensor ground sense (Kelvin)
+
+See [`docs/HARDWARE-DESIGN.md`](docs/HARDWARE-DESIGN.md) for the full block diagram, per-stage component values, filter/protection circuits, and schematic sheet organization.
