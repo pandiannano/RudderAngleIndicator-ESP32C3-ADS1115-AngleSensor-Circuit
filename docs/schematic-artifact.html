@@ -106,10 +106,10 @@
 <header class="hero">
   <p class="kicker">Drawing set &middot; 4 sheets + BOM</p>
   <h1>Rudder angle indicator &mdash; full schematic</h1>
-  <p class="lede">ESP32-C3 Pro Mini + ADS1115, powered from a 12&ndash;24V DC bus through an LM2596 buck stage. Two independent regulated rails: +5V runs the Pro Mini (self-regulating) and biases the float-sensor divider; +3.3V (AMS1117) is dedicated to the ADC and the Hall sensor's ratiometric supply.</p>
+  <p class="lede">ESP32-C3 Pro Mini + ADS1115, powered from a 12&ndash;24V DC bus of unknown polarity through a bridge-rectifier input stage and an LM2596 buck. Two independent regulated rails: +5V runs the Pro Mini (self-regulating) and biases the float-sensor divider; +3.3V (AMS1117) is dedicated to the ADC and the Hall sensor's ratiometric supply.</p>
   <div class="doc-meta">
     <span><b>Project</b> RA-1 Rudder Angle Indicator</span>
-    <span><b>Rev</b> B</span>
+    <span><b>Rev</b> C</span>
     <span><b>Sheets</b> 1&ndash;4 of 4</span>
     <span><b>MCU</b> ESP32-C3 Pro Mini</span>
     <span><b>ADC</b> ADS1115</span>
@@ -153,153 +153,169 @@
   <section class="sheet" id="sheet1">
     <div class="sheet-head">
       <h2>Sheet 1 &mdash; Power input &amp; LM2596 buck (12/24V &rarr; 5V)</h2>
-      <span class="sheet-no">RA-1&ndash;01 &middot; Rev B</span>
+      <span class="sheet-no">RA-1&ndash;01 &middot; Rev C</span>
     </div>
     <figure class="sheet-panel">
-      <svg viewBox="0 0 1080 480" role="img" aria-label="Schematic: DC input protection consisting of a fuse, a high-side P-channel MOSFET for reverse-polarity protection, a TVS diode clamp, and a bulk capacitor, feeding an LM2596 buck regulator that produces a regulated +5V rail with an output inductor, catch diode, output filter capacitors, and a feedback jumper wired to the true regulated output.">
+      <svg viewBox="0 0 1300 480" role="img" aria-label="Schematic: two-pin DC input of unknown polarity feeding a fuse and a full bridge rectifier wired across both input legs, so the rectifier's output is always correct polarity regardless of how the input is wired. A unidirectional TVS diode and bulk capacitor follow the rectifier, then an LM2596 buck regulator producing a regulated +5V rail with an output inductor, catch diode, output filter capacitors, and a feedback jumper wired to the true regulated output.">
         <defs>
           <pattern id="g1" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
-          <g id="s1-res-h"><line class="sym-line" x1="-34" y1="0" x2="-15" y2="0"/><rect class="sym-body" x="-15" y="-8" width="30" height="16"/><line class="sym-line" x1="15" y1="0" x2="34" y2="0"/></g>
-          <g id="s1-res-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-15"/><rect class="sym-body" x="-8" y="-15" width="16" height="30"/><line class="sym-line" x1="0" y1="15" x2="0" y2="34"/></g>
           <g id="s1-cap-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-5"/><line class="sym-line" x1="-11" y1="-5" x2="11" y2="-5"/><line class="sym-line" x1="-11" y1="5" x2="11" y2="5"/><line class="sym-line" x1="0" y1="5" x2="0" y2="34"/></g>
           <g id="s1-diode-catU"><line class="sym-line" x1="0" y1="30" x2="0" y2="8"/><polygon class="sym-fill" points="-8,8 8,8 0,-8"/><line class="sym-line" x1="-8" y1="-8" x2="8" y2="-8"/><line class="sym-line" x1="0" y1="-8" x2="0" y2="-30"/></g>
           <g id="s1-zener-catU"><line class="sym-line" x1="0" y1="30" x2="0" y2="8"/><polygon class="sym-fill" points="-8,8 8,8 0,-8"/><line class="sym-line" x1="-8" y1="-8" x2="8" y2="-8"/><line class="sym-line" x1="-8" y1="-8" x2="-12" y2="-13"/><line class="sym-line" x1="8" y1="-8" x2="4" y2="-3"/><line class="sym-line" x1="0" y1="-8" x2="0" y2="-30"/></g>
           <g id="s1-fuse-h"><line class="sym-line" x1="-34" y1="0" x2="-14" y2="0"/><ellipse class="sym-body" cx="0" cy="0" rx="14" ry="9"/><line class="sym-line" x1="-14" y1="0" x2="14" y2="0"/><line class="sym-line" x1="14" y1="0" x2="34" y2="0"/></g>
           <g id="s1-ind-h"><path class="sym-line" d="M -34 0 H -24 A 8 8 0 0 1 -8 0 A 8 8 0 0 1 8 0 A 8 8 0 0 1 24 0 H 34"/></g>
-          <g id="s1-fet"><circle class="sym-body" cx="0" cy="0" r="19"/><line class="sym-line" x1="0" y1="19" x2="0" y2="40"/><line class="sym-line" x1="-19" y1="0" x2="-40" y2="0"/><line class="sym-line" x1="0" y1="-19" x2="0" y2="-40"/><path class="sym-line" d="M -7 8 L -1 0 L -7 -8" fill="none"/></g>
           <g id="s1-gnd"><line class="sym-line" x1="0" y1="-16" x2="0" y2="0"/><line class="sym-line" x1="-13" y1="0" x2="13" y2="0"/><line class="sym-line" x1="-8" y1="6" x2="8" y2="6"/><line class="sym-line" x1="-4" y1="12" x2="4" y2="12"/></g>
           <g id="s1-dot"><circle class="dot" cx="0" cy="0" r="3.2"/></g>
           <g id="s1-flag-r"><polygon class="offpage" points="-30,-13 22,-13 36,0 22,13 -30,13"/></g>
+          <g id="s1-diode-tiny"><line class="sym-line" x1="-14" y1="0" x2="-5" y2="0"/><polygon class="sym-fill" points="-5,-5 -5,5 5,0"/><line class="sym-line" x1="5" y1="-5" x2="5" y2="5"/><line class="sym-line" x1="5" y1="0" x2="14" y2="0"/></g>
         </defs>
-        <rect width="1080" height="480" fill="url(#g1)"/>
+        <rect width="1300" height="480" fill="url(#g1)"/>
 
-        <!-- J1 DC input connector -->
+        <!-- J1 DC input connector — polarity-agnostic, both legs go into the bridge -->
         <rect class="sym-body" x="34" y="118" width="56" height="84"/>
         <text class="lbl" x="62" y="112" text-anchor="middle">J1</text>
         <text class="lbl-dim" x="62" y="216" text-anchor="middle">DC IN</text>
-        <text class="lbl-faint" x="62" y="146" text-anchor="middle">+</text>
-        <text class="lbl-faint" x="62" y="192" text-anchor="middle">&minus;</text>
-        <line class="wire wire-power" x1="90" y1="140" x2="150" y2="140"/>
-        <line class="wire" x1="90" y1="190" x2="110" y2="190"/>
-        <line class="wire" x1="110" y1="190" x2="110" y2="400"/>
+        <text class="lbl-faint" x="62" y="146" text-anchor="middle">A</text>
+        <text class="lbl-faint" x="62" y="192" text-anchor="middle">B</text>
+        <text class="lbl-faint" x="62" y="232" text-anchor="middle">either polarity</text>
 
-        <!-- +VBUS: fuse -->
+        <!-- Leg A: fuse, then into bridge AC1 -->
+        <line class="wire wire-power" x1="90" y1="140" x2="166" y2="140"/>
         <use href="#s1-fuse-h" x="200" y="140" class="wire-power"/>
         <text class="lbl" x="200" y="112" text-anchor="middle">F1</text>
         <text class="lbl-dim" x="200" y="168" text-anchor="middle">1A fast-blow</text>
-        <line class="wire wire-power" x1="234" y1="140" x2="300" y2="140"/>
+        <line class="wire wire-power" x1="234" y1="140" x2="368" y2="140"/>
 
-        <!-- Q1 reverse-polarity P-MOSFET -->
-        <use href="#s1-fet" x="340" y="140" class="wire-power"/>
-        <text class="lbl" x="340" y="88" text-anchor="middle">Q1</text>
-        <text class="lbl-dim" x="340" y="72" text-anchor="middle">P-CH MOSFET (reverse-polarity)</text>
-        <text class="lbl-faint" x="304" y="132" text-anchor="middle">S</text>
-        <text class="lbl-faint" x="376" y="132" text-anchor="middle">D</text>
-        <text class="lbl-faint" x="352" y="196" text-anchor="middle">G</text>
-        <line class="wire" x1="340" y1="180" x2="340" y2="226"/>
-        <use href="#s1-res-v" x="340" y="260"/>
-        <text class="lbl" x="368" y="256">R1</text>
-        <text class="lbl-dim" x="368" y="272">10k</text>
-        <line class="wire" x1="340" y1="294" x2="340" y2="400"/>
-        <use href="#s1-dot" x="340" y="400"/>
+        <!-- Leg B: straight into bridge AC2, routed under the bridge -->
+        <line class="wire" x1="90" y1="190" x2="90" y2="210"/>
+        <line class="wire" x1="90" y1="210" x2="452" y2="210"/>
+        <line class="wire" x1="452" y1="210" x2="452" y2="140"/>
 
-        <line class="wire wire-power" x1="380" y1="140" x2="460" y2="140"/>
-        <use href="#s1-dot" x="460" y="140"/>
+        <!-- BR1 full bridge rectifier — DC in on the AC terminals, so output polarity is fixed regardless of J1 wiring -->
+        <line class="sym-line" x1="368" y1="140" x2="410" y2="98"/>
+        <line class="sym-line" x1="410" y1="98" x2="452" y2="140"/>
+        <line class="sym-line" x1="452" y1="140" x2="410" y2="182"/>
+        <line class="sym-line" x1="410" y1="182" x2="368" y2="140"/>
+        <use href="#s1-diode-tiny" x="389" y="119" transform="rotate(-45 389 119)"/>
+        <use href="#s1-diode-tiny" x="431" y="119" transform="rotate(-135 431 119)"/>
+        <use href="#s1-diode-tiny" x="389" y="161" transform="rotate(-135 389 161)"/>
+        <use href="#s1-diode-tiny" x="431" y="161" transform="rotate(-45 431 161)"/>
+        <text class="lbl" x="490" y="228">BR1 &middot; W10</text>
+        <text class="lbl-dim" x="490" y="243">1.5A/1000V bridge,</text>
+        <text class="lbl-dim" x="490" y="257">used as a DC polarity rectifier</text>
+        <text class="lbl-faint" x="330" y="140" text-anchor="middle" dy="-6">AC1</text>
+        <text class="lbl-faint" x="495" y="140" text-anchor="start" dy="-6">AC2</text>
+        <text class="lbl-power" x="410" y="88" text-anchor="middle">+</text>
+        <text class="lbl-faint" x="428" y="200">&minus;</text>
 
-        <!-- D1 TVS -->
-        <line class="wire wire-power" x1="460" y1="140" x2="460" y2="190"/>
-        <use href="#s1-zener-catU" x="460" y="220" class="wire-power"/>
-        <text class="lbl" x="490" y="196">D1</text>
-        <text class="lbl-dim" x="490" y="212">TVS 33V</text>
-        <line class="wire" x1="460" y1="250" x2="460" y2="400"/>
-        <use href="#s1-dot" x="460" y="400"/>
+        <!-- + output: short detour up and back down to the main rail -->
+        <line class="wire wire-power" x1="410" y1="98" x2="410" y2="80"/>
+        <line class="wire wire-power" x1="410" y1="80" x2="600" y2="80"/>
+        <line class="wire wire-power" x1="600" y1="80" x2="600" y2="140"/>
+        <line class="wire wire-power" x1="600" y1="140" x2="640" y2="140"/>
+        <use href="#s1-dot" x="640" y="140"/>
 
-        <line class="wire wire-power" x1="460" y1="140" x2="560" y2="140"/>
-        <use href="#s1-dot" x="560" y="140"/>
+        <!-- − output: straight down to GND bus (this becomes the system ground reference) -->
+        <line class="wire" x1="410" y1="182" x2="410" y2="400"/>
+        <use href="#s1-dot" x="410" y="400"/>
+
+        <!-- D1 TVS — now unidirectional, since the bridge fixes output polarity -->
+        <line class="wire wire-power" x1="640" y1="140" x2="640" y2="190"/>
+        <use href="#s1-zener-catU" x="640" y="220" class="wire-power"/>
+        <text class="lbl" x="670" y="196">D1</text>
+        <text class="lbl-dim" x="670" y="212">TVS 33V</text>
+        <line class="wire" x1="640" y1="250" x2="640" y2="400"/>
+        <use href="#s1-dot" x="640" y="400"/>
+
+        <line class="wire wire-power" x1="640" y1="140" x2="740" y2="140"/>
+        <use href="#s1-dot" x="740" y="140"/>
 
         <!-- C1 bulk cap -->
-        <line class="wire wire-power" x1="560" y1="140" x2="560" y2="186"/>
-        <use href="#s1-cap-v" x="560" y="220"/>
-        <text class="lbl" x="590" y="196">C1</text>
-        <text class="lbl-dim" x="590" y="212">220&#181;F/50V</text>
-        <line class="wire" x1="560" y1="254" x2="560" y2="400"/>
-        <use href="#s1-dot" x="560" y="400"/>
+        <line class="wire wire-power" x1="740" y1="140" x2="740" y2="186"/>
+        <use href="#s1-cap-v" x="740" y="220"/>
+        <text class="lbl" x="770" y="196">C1</text>
+        <text class="lbl-dim" x="770" y="212">220&#181;F/50V</text>
+        <line class="wire" x1="740" y1="254" x2="740" y2="400"/>
+        <use href="#s1-dot" x="740" y="400"/>
 
-        <line class="wire wire-power" x1="560" y1="140" x2="700" y2="140"/>
+        <line class="wire wire-power" x1="740" y1="140" x2="880" y2="140"/>
 
         <!-- U1 LM2596 -->
-        <rect class="icbody" x="700" y="90" width="150" height="150"/>
-        <text class="icname" x="775" y="75" text-anchor="middle">U1 &middot; LM2596-5.0</text>
-        <text class="lbl-faint" x="775" y="255" text-anchor="middle">buck regulator, TO-220-5 or module</text>
-        <text class="lbl-dim" x="710" y="135">VIN</text>
-        <text class="lbl-dim" x="710" y="175">GND</text>
-        <text class="lbl-dim" x="710" y="215">ON/OFF</text>
-        <text class="lbl-dim" x="840" y="135" text-anchor="end">OUTPUT</text>
-        <text class="lbl-dim" x="840" y="175" text-anchor="end">FEEDBACK</text>
-        <line class="wire" x1="670" y1="170" x2="700" y2="170"/>
-        <line class="wire" x1="670" y1="170" x2="670" y2="400"/>
-        <use href="#s1-dot" x="670" y="400"/>
-        <line class="wire" x1="760" y1="240" x2="760" y2="400"/>
-        <use href="#s1-dot" x="760" y="400"/>
-        <text class="lbl-faint" x="768" y="230">tie low = always on</text>
+        <rect class="icbody" x="880" y="90" width="150" height="150"/>
+        <text class="icname" x="955" y="75" text-anchor="middle">U1 &middot; LM2596-5.0</text>
+        <text class="lbl-faint" x="955" y="255" text-anchor="middle">buck regulator, TO-220-5 or module</text>
+        <text class="lbl-dim" x="890" y="135">VIN</text>
+        <text class="lbl-dim" x="890" y="175">GND</text>
+        <text class="lbl-dim" x="890" y="215">ON/OFF</text>
+        <text class="lbl-dim" x="1020" y="135" text-anchor="end">OUTPUT</text>
+        <text class="lbl-dim" x="1020" y="175" text-anchor="end">FEEDBACK</text>
+        <line class="wire" x1="850" y1="170" x2="880" y2="170"/>
+        <line class="wire" x1="850" y1="170" x2="850" y2="400"/>
+        <use href="#s1-dot" x="850" y="400"/>
+        <line class="wire" x1="940" y1="240" x2="940" y2="400"/>
+        <use href="#s1-dot" x="940" y="400"/>
+        <text class="lbl-faint" x="948" y="230">tie low = always on</text>
 
         <!-- OUTPUT -> catch diode + inductor + output caps -->
-        <line class="wire wire-power" x1="850" y1="130" x2="900" y2="130"/>
-        <use href="#s1-dot" x="900" y="130"/>
-        <line class="wire wire-power" x1="900" y1="130" x2="900" y2="190"/>
-        <use href="#s1-diode-catU" x="900" y="220" class="wire-power"/>
-        <text class="lbl" x="930" y="196">D2</text>
-        <text class="lbl-dim" x="930" y="212">1N5822 Schottky</text>
-        <line class="wire" x1="900" y1="250" x2="900" y2="400"/>
-        <use href="#s1-dot" x="900" y="400"/>
+        <line class="wire wire-power" x1="1030" y1="130" x2="1080" y2="130"/>
+        <use href="#s1-dot" x="1080" y="130"/>
+        <line class="wire wire-power" x1="1080" y1="130" x2="1080" y2="190"/>
+        <use href="#s1-diode-catU" x="1080" y="220" class="wire-power"/>
+        <text class="lbl" x="1110" y="196">D2</text>
+        <text class="lbl-dim" x="1110" y="212">1N5822 Schottky</text>
+        <line class="wire" x1="1080" y1="250" x2="1080" y2="400"/>
+        <use href="#s1-dot" x="1080" y="400"/>
 
-        <use href="#s1-ind-h" x="940" y="130" class="wire-power"/>
-        <text class="lbl" x="940" y="106" text-anchor="middle">L1</text>
-        <text class="lbl-dim" x="940" y="120" text-anchor="middle">33&ndash;68&#181;H</text>
+        <use href="#s1-ind-h" x="1120" y="130" class="wire-power"/>
+        <text class="lbl" x="1120" y="106" text-anchor="middle">L1</text>
+        <text class="lbl-dim" x="1120" y="120" text-anchor="middle">33&ndash;68&#181;H</text>
 
-        <line class="wire wire-power" x1="974" y1="130" x2="1000" y2="130"/>
-        <use href="#s1-dot" x="1000" y="130"/>
-        <line class="wire wire-power" x1="1000" y1="130" x2="1000" y2="186"/>
-        <use href="#s1-cap-v" x="1000" y="220"/>
-        <text class="lbl" x="1000" y="256" text-anchor="middle">C2 / C2b</text>
-        <text class="lbl-dim" x="1000" y="270" text-anchor="middle">220&#181;F + 100nF</text>
-        <line class="wire" x1="1000" y1="254" x2="1000" y2="400"/>
-        <use href="#s1-dot" x="1000" y="400"/>
+        <line class="wire wire-power" x1="1154" y1="130" x2="1180" y2="130"/>
+        <use href="#s1-dot" x="1180" y="130"/>
+        <line class="wire wire-power" x1="1180" y1="130" x2="1180" y2="186"/>
+        <use href="#s1-cap-v" x="1180" y="220"/>
+        <text class="lbl" x="1180" y="256" text-anchor="middle">C2 / C2b</text>
+        <text class="lbl-dim" x="1180" y="270" text-anchor="middle">220&#181;F + 100nF</text>
+        <line class="wire" x1="1180" y1="254" x2="1180" y2="400"/>
+        <use href="#s1-dot" x="1180" y="400"/>
 
         <!-- Feedback jumper: pin4 back to regulated output -->
-        <line class="wire wire-power" x1="850" y1="170" x2="870" y2="170"/>
-        <line class="wire wire-power" x1="870" y1="170" x2="870" y2="60"/>
-        <line class="wire wire-power" x1="870" y1="60" x2="1000" y2="60"/>
-        <line class="wire wire-power" x1="1000" y1="60" x2="1000" y2="130"/>
-        <text class="lbl-faint" x="935" y="52">FB jumper &mdash; senses true regulated output, not the switch node</text>
+        <line class="wire wire-power" x1="1030" y1="170" x2="1050" y2="170"/>
+        <line class="wire wire-power" x1="1050" y1="170" x2="1050" y2="60"/>
+        <line class="wire wire-power" x1="1050" y1="60" x2="1180" y2="60"/>
+        <line class="wire wire-power" x1="1180" y1="60" x2="1180" y2="130"/>
+        <text class="lbl-faint" x="1115" y="52">FB jumper &mdash; senses true regulated output, not the switch node</text>
 
         <!-- off-page +5V — fans out to three sheets -->
-        <use href="#s1-flag-r" x="1035" y="130" class="offpage offpage-power"/>
-        <text class="lbl-power" x="1035" y="135" text-anchor="middle" font-family="var(--font-mono)" font-weight="700">+5V</text>
-        <text class="lbl-faint" x="1035" y="160" text-anchor="middle">&rarr; SHEET 2 (AMS1117)</text>
-        <text class="lbl-faint" x="1035" y="176" text-anchor="middle">&rarr; SHEET 3 (Pro Mini)</text>
-        <text class="lbl-faint" x="1035" y="192" text-anchor="middle">&rarr; SHEET 4 (float divider)</text>
+        <use href="#s1-flag-r" x="1215" y="130" class="offpage offpage-power"/>
+        <text class="lbl-power" x="1215" y="135" text-anchor="middle" font-family="var(--font-mono)" font-weight="700">+5V</text>
+        <text class="lbl-faint" x="1215" y="160" text-anchor="middle">&rarr; SHEET 2 (AMS1117)</text>
+        <text class="lbl-faint" x="1215" y="176" text-anchor="middle">&rarr; SHEET 3 (Pro Mini)</text>
+        <text class="lbl-faint" x="1215" y="192" text-anchor="middle">&rarr; SHEET 4 (float divider)</text>
 
         <!-- GND bus -->
-        <line class="wire" x1="110" y1="400" x2="1000" y2="400"/>
-        <use href="#s1-gnd" x="540" y="400"/>
-        <text class="lbl-faint" x="540" y="440" text-anchor="middle">GND</text>
+        <line class="wire" x1="410" y1="400" x2="1180" y2="400"/>
+        <use href="#s1-gnd" x="750" y="400"/>
+        <text class="lbl-faint" x="750" y="440" text-anchor="middle">GND</text>
 
         <g class="titleblock">
-          <rect x="740" y="404" width="300" height="66"/>
-          <text x="750" y="420" class="tb-strong">RA-1 &middot; POWER INPUT</text>
-          <text x="750" y="436">SHEET 1 OF 4</text>
-          <text x="750" y="452">REV B</text>
-          <text x="940" y="436">SIZE A4</text>
-          <text x="940" y="452">SCALE NONE</text>
+          <rect x="920" y="404" width="300" height="66"/>
+          <text x="930" y="420" class="tb-strong">RA-1 &middot; POWER INPUT</text>
+          <text x="930" y="436">SHEET 1 OF 4</text>
+          <text x="930" y="452">REV C</text>
+          <text x="1120" y="436">SIZE A4</text>
+          <text x="1120" y="452">SCALE NONE</text>
         </g>
       </svg>
-      <figcaption>Reverse-polarity P-MOSFET, fuse and TVS clamp protect the LM2596 buck stage; the feedback pin is jumpered to the true regulated output (after L1/C2), not the switching node.</figcaption>
+      <figcaption>A full bridge rectifier (BR1) sits across both input legs instead of the earlier reverse-polarity MOSFET: whichever way J1 is wired, BR1's output is always correct polarity into the TVS/LM2596 chain. D1 is now a simple unidirectional TVS since polarity downstream is guaranteed.</figcaption>
     </figure>
 
     <ul class="notes">
-      <li><b>Q1 gate bias.</b> R1 pulls the gate toward GND relative to source, holding the P-MOSFET on under normal (correct) polarity; on a reverse connection the channel stays off. For 24V systems, consider adding a 15V zener from gate to source to clamp Vgs.</li>
-      <li><b>D1 TVS selection.</b> Use a 33V-clamp part (e.g. SMBJ33A) on 24V systems, or an 18V part on 12V-only systems &mdash; size it to survive alternator load-dump without clamping normal operating voltage.</li>
+      <li><b>Why a bridge instead of the MOSFET.</b> Using DC on a bridge rectifier's AC terminals is a standard trick: two of the four diodes always conduct, so the output is correct-polarity no matter which way J1 is wired. Unlike the earlier series-MOSFET protection, which simply blocks power on a reversed connection, the bridge keeps the indicator <i>working</i> even if someone wires it backwards &mdash; worth deciding whether that's what you want for a helm instrument versus a hard fail that makes a wiring mistake obvious.</li>
+      <li><b>The cost is voltage drop, not complexity.</b> Two diodes conduct in series at any time, so BR1 drops roughly 2&times;V<sub>f</sub> &asymp; 1.4&ndash;2V (standard silicon) continuously &mdash; negligible headroom loss on 24V, but worth checking on a 12V system during engine-cranking sag (LM2596 still regulates fine down to a few volts above 5V, so there's margin, just less of it).</li>
+      <li><b>Thermal.</b> At an estimated few hundred mA total system draw, a W10 DIP package runs cool with no heatsink. If your real current draw creeps toward 1A continuous, consider a Schottky bridge (e.g. GBU-series) instead &mdash; roughly half the voltage drop and dissipation of a silicon bridge like the W10.</li>
+      <li><b>Fuse placement.</b> F1 only needs to sit in series with one leg (here, leg A, ahead of BR1's AC1 terminal) &mdash; a single fuse still protects the loop regardless of which physical wire ends up carrying current.</li>
+      <li><b>D1 TVS selection.</b> Use a 33V-clamp part (e.g. SMBJ33A) on 24V systems, or an 18V part on 12V-only systems &mdash; size it to survive alternator load-dump without clamping normal operating voltage. It's unidirectional now since BR1 fixes the polarity ahead of it.</li>
       <li><b>L1 selection.</b> Pick inductance from the LM2596 datasheet's Vin/Vout/Iload chart, sized for the combined load: Pro Mini Wi-Fi peaks + AMS1117 input current + float-divider current. Use a shielded type to limit radiated EMI near the analog front end on Sheet 4.</li>
       <li><b>U1 package note.</b> Confirm exact pin numbering against the datasheet for your chosen package (TO-220-5 IC vs. a drop-in module).</li>
     </ul>
@@ -309,11 +325,10 @@
         <caption>Sheet 1 &mdash; bill of materials</caption>
         <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>J1</td><td>DC input connector</td><td>2-pin, 5.08mm terminal block</td><td>Rated &ge;3A</td></tr>
-          <tr><td>F1</td><td>Fuse</td><td>1A fast-blow (or PTC resettable)</td><td>In series with +VBUS</td></tr>
-          <tr><td>Q1</td><td>P-channel MOSFET</td><td>e.g. SI2333DDS</td><td>High-side reverse-polarity block</td></tr>
-          <tr><td>R1</td><td>Resistor</td><td>10k&#8486; 1/4W</td><td>Q1 gate pulldown</td></tr>
-          <tr><td>D1</td><td>TVS diode</td><td>SMBJ33A (24V) / SMBJ18A (12V)</td><td>Across +VBUS after F1</td></tr>
+          <tr><td>J1</td><td>DC input connector</td><td>2-pin, 5.08mm terminal block</td><td>Rated &ge;3A, either polarity</td></tr>
+          <tr><td>F1</td><td>Fuse</td><td>1A fast-blow (or PTC resettable)</td><td>In series with leg A, ahead of BR1</td></tr>
+          <tr><td>BR1</td><td>Bridge rectifier</td><td>W10 (1.5A / 1000V DIP)</td><td>DC in on AC terminals &mdash; polarity-agnostic</td></tr>
+          <tr><td>D1</td><td>TVS diode</td><td>SMBJ33A (24V) / SMBJ18A (12V)</td><td>Unidirectional, after BR1</td></tr>
           <tr><td>C1</td><td>Electrolytic cap</td><td>220&#181;F / 50V</td><td>Input bulk</td></tr>
           <tr><td>U1</td><td>Buck regulator</td><td>LM2596-5.0</td><td>Fixed 5V output</td></tr>
           <tr><td>L1</td><td>Power inductor</td><td>33&ndash;68&#181;H, shielded</td><td>Per LM2596 selection chart</td></tr>
@@ -330,7 +345,7 @@
   <section class="sheet" id="sheet2">
     <div class="sheet-head">
       <h2>Sheet 2 &mdash; AMS1117-3.3 LDO &amp; rail distribution (5V &rarr; 3.3V)</h2>
-      <span class="sheet-no">RA-1&ndash;02 &middot; Rev B</span>
+      <span class="sheet-no">RA-1&ndash;02 &middot; Rev C</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: 5V rail from Sheet 1 feeding an AMS1117-3.3 linear regulator with input and output decoupling capacitors, producing a clean 3.3V rail dedicated to the ADC domain, fanning out only to the ADS1115 VDD and the Hall sensor supply on Sheet 4 — the ESP32-C3 Pro Mini is not on this rail.">
@@ -420,7 +435,7 @@
   <section class="sheet" id="sheet3">
     <div class="sheet-head">
       <h2>Sheet 3 &mdash; ESP32-C3 Pro Mini</h2>
-      <span class="sheet-no">RA-1&ndash;03 &middot; Rev B</span>
+      <span class="sheet-no">RA-1&ndash;03 &middot; Rev C</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: ESP32-C3 Pro Mini board fed directly from the +5V rail, using its own onboard regulation, with only a small optional bulk capacitor added externally, and I2C SDA/SCL plus an ALERT interrupt line routed off-page to the ADS1115 sheet.">
@@ -504,7 +519,7 @@
   <section class="sheet" id="sheet4">
     <div class="sheet-head">
       <h2>Sheet 4 &mdash; ADS1115 &amp; sensor interface</h2>
-      <span class="sheet-no">RA-1&ndash;04 &middot; Rev B</span>
+      <span class="sheet-no">RA-1&ndash;04 &middot; Rev C</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1160 1140" role="img" aria-label="Schematic: ADS1115 ADC with I2C pull-ups and ADDR tied low. AIN0 reads the Hall angle sensor through an RC filter and diode clamp. AIN1 reads a 5V-biased resistive divider (510 ohm fixed resistor on-board, 0 to 190 ohm float sender remote at the tank) through the same filter and clamp. AIN2 and AIN3 are Kelvin-sense lines back to the Hall sensor's own supply and ground pins, each with matching filter and clamp networks, connected through a five-pin connector to the sensor.">
@@ -714,7 +729,7 @@
           <rect x="820" y="1070" width="240" height="60"/>
           <text x="830" y="1086" class="tb-strong">RA-1 &middot; ADC + SENSOR</text>
           <text x="830" y="1102" >SHEET 4 OF 4</text>
-          <text x="830" y="1118">REV B</text>
+          <text x="830" y="1118">REV C</text>
           <text x="980" y="1102">SIZE A3</text>
           <text x="980" y="1118">SCALE NONE</text>
         </g>
@@ -759,7 +774,7 @@
   <section class="sheet" id="bom">
     <div class="sheet-head">
       <h2>Full bill of materials</h2>
-      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev B</span>
+      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev C</span>
     </div>
     <div class="tblwrap">
       <table>
@@ -767,8 +782,7 @@
         <tbody>
           <tr><td>J1</td><td>DC input connector</td><td>2-pin terminal block</td><td>1</td></tr>
           <tr><td>F1</td><td>Fuse</td><td>1A fast-blow</td><td>1</td></tr>
-          <tr><td>Q1</td><td>P-channel MOSFET</td><td>SI2333DDS or equiv.</td><td>1</td></tr>
-          <tr><td>R1</td><td>Resistor</td><td>10k&#8486;</td><td>1</td></tr>
+          <tr><td>BR1</td><td>Bridge rectifier</td><td>W10 (1.5A/1000V)</td><td>1</td></tr>
           <tr><td>D1</td><td>TVS diode</td><td>SMBJ33A / SMBJ18A</td><td>1</td></tr>
           <tr><td>C1</td><td>Electrolytic cap</td><td>220&#181;F/50V</td><td>1</td></tr>
           <tr><td>U1</td><td>Buck regulator</td><td>LM2596-5.0</td><td>1</td></tr>
@@ -802,5 +816,5 @@
 </div>
 
 <footer>
-  RA-1 Rudder Angle Indicator &middot; Rev B &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
+  RA-1 Rudder Angle Indicator &middot; Rev C &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
 </footer>

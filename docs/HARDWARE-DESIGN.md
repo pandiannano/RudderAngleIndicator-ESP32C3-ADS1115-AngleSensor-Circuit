@@ -8,10 +8,10 @@ ESP32-C3 Pro Mini + ADS1115 + Hall-effect rudder angle sensor + resistive float 
 
 ```mermaid
 flowchart TB
-    subgraph INPUT["Power Input Stage (12V / 24V DC bus)"]
-        BUS["DC Bus 12V/24V"] --> FUSE["Fuse / PTC 1A"]
-        FUSE --> RPP["Reverse Polarity Protection\n(P-MOSFET, high-side)"]
-        RPP --> TVS["TVS Diode\n(clamps load-dump spikes)"]
+    subgraph INPUT["Power Input Stage (12V / 24V DC bus, unknown polarity)"]
+        BUS["DC Bus 12V/24V"] --> FUSE["Fuse / PTC 1A\n(one leg)"]
+        FUSE --> BRIDGE["BR1: Bridge Rectifier (W10)\nDC on AC terminals -> fixed-polarity DC out"]
+        BRIDGE --> TVS["TVS Diode, unidirectional\n(clamps load-dump spikes)"]
         TVS --> CIN["Input Bulk Cap\n100-220uF / 50V"]
     end
 
@@ -57,16 +57,23 @@ flowchart TB
 
 ## 2. Power input stage
 
-Boat 12V/24V rails are electrically dirty: alternator load-dump transients, other loads switching on/off, and occasional reverse-connection mistakes. Protect before the regulator:
+Boat 12V/24V rails are electrically dirty: alternator load-dump transients, other loads switching on/off, and occasional reverse-connection mistakes. This revision protects reverse polarity with a **full bridge rectifier (BR1)** wired across both input legs, rather than a series MOSFET.
 
 | Component | Purpose | Suggested part / value |
 |---|---|---|
-| Fuse / PTC resettable fuse | Over-current / short protection | 1 A fast-blow, or 0.5–1 A PTC |
-| P-channel MOSFET (high-side) | Reverse-polarity protection, low loss | e.g. IRF9540 / SI2333 depending on current |
-| TVS diode across input | Clamp load-dump / switching transients | SMBJ33A (24V systems) or SMBJ18A (12V systems) |
+| Fuse / PTC resettable fuse | Over-current / short protection | 1 A fast-blow, or 0.5–1 A PTC, in series with one input leg |
+| Bridge rectifier (BR1) | Polarity-agnostic input — output is always correct polarity | W10 (1.5A / 1000V DIP) |
+| TVS diode (unidirectional) | Clamp load-dump / switching transients | SMBJ33A (24V systems) or SMBJ18A (12V systems), after BR1 |
 | Input bulk capacitor | Absorb ripple, supply buck's pulsed current | 100–220 µF electrolytic, ≥50V rating |
 
-A series Schottky diode (e.g. SS34) is a simpler but lossier alternative to the P-MOSFET for reverse-polarity protection; at these currents the MOSFET is worth the extra part.
+**Why a bridge instead of a MOSFET.** Feeding an unknown-polarity DC source into a bridge rectifier's two AC terminals is a standard trick: whichever leg is actually positive, two of the four diodes conduct and the DC output on the +/− terminals is always correct polarity. Compared to the earlier series P-MOSFET approach:
+
+- **It keeps working when reversed**, not just protected. The MOSFET approach blocks current entirely on a reversed connection (safe, but the board doesn't power up). The bridge continues to deliver power regardless of which way J1 is wired — worth deciding whether that's actually what you want for a helm instrument (staying alive through a wiring mistake) versus a hard, obvious fail (nothing lights up until the wiring is fixed).
+- **The cost is a voltage drop, not complexity.** Two diodes conduct in series at any moment, so BR1 drops roughly 2×V<sub>f</sub> ≈ 1.4–2V continuously (standard silicon). On a 24V system this is a rounding error. On a 12V system, check it against engine-cranking sag — the LM2596 still regulates comfortably down to a few volts above 5V, so there's margin, just less of it than with the MOSFET's near-zero drop.
+- **Thermal.** At an estimated few hundred mA total system draw, a W10 DIP runs cool with no heatsink. If real current draw creeps toward 1A continuous, a Schottky bridge (e.g. a GBU-series part) roughly halves the voltage drop and dissipation of a standard silicon bridge like the W10.
+- **Simpler to build.** One 4-pin part, no gate-bias resistor or reverse-connection failure mode to reason through — the old Q1/R1 pair is removed entirely.
+
+**Ordering:** Fuse → BR1 → TVS → bulk cap → LM2596. The fuse only needs to be in series with one input leg (it still protects the loop regardless of which physical wire ends up carrying current). Placing the TVS *after* BR1 means it only ever needs to be unidirectional, since polarity is already fixed by that point — putting it before the bridge would mean protecting an unknown-polarity node, which needs a bidirectional TVS instead.
 
 ## 3. LM2596 buck stage (→ 5V intermediate rail)
 
