@@ -106,12 +106,12 @@
 <header class="hero">
   <p class="kicker">Drawing set &middot; 4 sheets + BOM</p>
   <h1>Rudder angle indicator &mdash; full schematic</h1>
-  <p class="lede">ESP32-C3 + ADS1115, powered from a 12&ndash;24V DC bus through an LM2596 buck stage and an AMS1117-3.3 LDO, reading a ratiometric 0&ndash;360&deg; Hall-effect sensor with Kelvin-sensed supply/ground compensation.</p>
+  <p class="lede">ESP32-C3 Pro Mini + ADS1115, powered from a 12&ndash;24V DC bus through an LM2596 buck stage. Two independent regulated rails: +5V runs the Pro Mini (self-regulating) and biases the float-sensor divider; +3.3V (AMS1117) is dedicated to the ADC and the Hall sensor's ratiometric supply.</p>
   <div class="doc-meta">
     <span><b>Project</b> RA-1 Rudder Angle Indicator</span>
-    <span><b>Rev</b> A</span>
+    <span><b>Rev</b> B</span>
     <span><b>Sheets</b> 1&ndash;4 of 4</span>
-    <span><b>MCU</b> ESP32-C3</span>
+    <span><b>MCU</b> ESP32-C3 Pro Mini</span>
     <span><b>ADC</b> ADS1115</span>
   </div>
 </header>
@@ -121,7 +121,7 @@
     <a href="#legend">Legend</a>
     <a href="#sheet1">Sheet 1 &middot; Power Input</a>
     <a href="#sheet2">Sheet 2 &middot; 3.3V Rail</a>
-    <a href="#sheet3">Sheet 3 &middot; ESP32-C3</a>
+    <a href="#sheet3">Sheet 3 &middot; ESP32-C3 Pro Mini</a>
     <a href="#sheet4">Sheet 4 &middot; ADC &amp; Sensor</a>
     <a href="#bom">Full BOM</a>
   </div>
@@ -153,7 +153,7 @@
   <section class="sheet" id="sheet1">
     <div class="sheet-head">
       <h2>Sheet 1 &mdash; Power input &amp; LM2596 buck (12/24V &rarr; 5V)</h2>
-      <span class="sheet-no">RA-1&ndash;01 &middot; Rev A</span>
+      <span class="sheet-no">RA-1&ndash;01 &middot; Rev B</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1080 480" role="img" aria-label="Schematic: DC input protection consisting of a fuse, a high-side P-channel MOSFET for reverse-polarity protection, a TVS diode clamp, and a bulk capacitor, feeding an LM2596 buck regulator that produces a regulated +5V rail with an output inductor, catch diode, output filter capacitors, and a feedback jumper wired to the true regulated output.">
@@ -273,10 +273,12 @@
         <line class="wire wire-power" x1="1000" y1="60" x2="1000" y2="130"/>
         <text class="lbl-faint" x="935" y="52">FB jumper &mdash; senses true regulated output, not the switch node</text>
 
-        <!-- off-page +5V -->
+        <!-- off-page +5V — fans out to three sheets -->
         <use href="#s1-flag-r" x="1035" y="130" class="offpage offpage-power"/>
         <text class="lbl-power" x="1035" y="135" text-anchor="middle" font-family="var(--font-mono)" font-weight="700">+5V</text>
-        <text class="lbl-faint" x="1035" y="160" text-anchor="middle">&rarr; SHEET 2</text>
+        <text class="lbl-faint" x="1035" y="160" text-anchor="middle">&rarr; SHEET 2 (AMS1117)</text>
+        <text class="lbl-faint" x="1035" y="176" text-anchor="middle">&rarr; SHEET 3 (Pro Mini)</text>
+        <text class="lbl-faint" x="1035" y="192" text-anchor="middle">&rarr; SHEET 4 (float divider)</text>
 
         <!-- GND bus -->
         <line class="wire" x1="110" y1="400" x2="1000" y2="400"/>
@@ -287,7 +289,7 @@
           <rect x="740" y="404" width="300" height="66"/>
           <text x="750" y="420" class="tb-strong">RA-1 &middot; POWER INPUT</text>
           <text x="750" y="436">SHEET 1 OF 4</text>
-          <text x="750" y="452">REV A</text>
+          <text x="750" y="452">REV B</text>
           <text x="940" y="436">SIZE A4</text>
           <text x="940" y="452">SCALE NONE</text>
         </g>
@@ -298,7 +300,7 @@
     <ul class="notes">
       <li><b>Q1 gate bias.</b> R1 pulls the gate toward GND relative to source, holding the P-MOSFET on under normal (correct) polarity; on a reverse connection the channel stays off. For 24V systems, consider adding a 15V zener from gate to source to clamp Vgs.</li>
       <li><b>D1 TVS selection.</b> Use a 33V-clamp part (e.g. SMBJ33A) on 24V systems, or an 18V part on 12V-only systems &mdash; size it to survive alternator load-dump without clamping normal operating voltage.</li>
-      <li><b>L1 selection.</b> Pick inductance from the LM2596 datasheet's Vin/Vout/Iload chart; use a shielded type to limit radiated EMI near the analog front end on Sheet 4.</li>
+      <li><b>L1 selection.</b> Pick inductance from the LM2596 datasheet's Vin/Vout/Iload chart, sized for the combined load: Pro Mini Wi-Fi peaks + AMS1117 input current + float-divider current. Use a shielded type to limit radiated EMI near the analog front end on Sheet 4.</li>
       <li><b>U1 package note.</b> Confirm exact pin numbering against the datasheet for your chosen package (TO-220-5 IC vs. a drop-in module).</li>
     </ul>
 
@@ -328,10 +330,10 @@
   <section class="sheet" id="sheet2">
     <div class="sheet-head">
       <h2>Sheet 2 &mdash; AMS1117-3.3 LDO &amp; rail distribution (5V &rarr; 3.3V)</h2>
-      <span class="sheet-no">RA-1&ndash;02 &middot; Rev A</span>
+      <span class="sheet-no">RA-1&ndash;02 &middot; Rev B</span>
     </div>
     <figure class="sheet-panel">
-      <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: 5V rail from Sheet 1 feeding an AMS1117-3.3 linear regulator with input and output decoupling capacitors, producing a clean 3.3V rail that fans out to the ESP32-C3, the ADS1115, and the sensor supply on later sheets.">
+      <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: 5V rail from Sheet 1 feeding an AMS1117-3.3 linear regulator with input and output decoupling capacitors, producing a clean 3.3V rail dedicated to the ADC domain, fanning out only to the ADS1115 VDD and the Hall sensor supply on Sheet 4 — the ESP32-C3 Pro Mini is not on this rail.">
         <defs>
           <pattern id="g2" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
           <g id="s2-cap-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-5"/><line class="sym-line" x1="-11" y1="-5" x2="11" y2="-5"/><line class="sym-line" x1="-11" y1="5" x2="11" y2="5"/><line class="sym-line" x1="0" y1="5" x2="0" y2="34"/></g>
@@ -372,42 +374,31 @@
         <text class="lbl-dim" x="470" y="290" text-anchor="middle">22&#181;F + 100nF</text>
         <line class="wire" x1="470" y1="264" x2="470" y2="300"/>
 
-        <line class="wire wire-power" x1="470" y1="105" x2="560" y2="105"/>
-        <use href="#s2-dot" x="560" y="105"/>
-        <line class="wire wire-power" x1="560" y1="105" x2="560" y2="196"/>
-        <use href="#s2-cap-v" x="560" y="230"/>
-        <text class="lbl" x="560" y="276" text-anchor="middle">C6</text>
-        <text class="lbl-dim" x="560" y="290" text-anchor="middle">100&ndash;220&#181;F</text>
-        <line class="wire" x1="560" y1="264" x2="560" y2="300"/>
-        <text class="lbl-faint" x="560" y="65" text-anchor="middle">bulk, near ESP32-C3</text>
+        <line class="wire wire-power" x1="470" y1="105" x2="760" y2="105"/>
 
-        <line class="wire wire-power" x1="560" y1="105" x2="960" y2="105"/>
+        <line class="wire wire-power" x1="600" y1="105" x2="600" y2="150"/>
+        <use href="#s2-flag-d" x="600" y="170" class="offpage offpage-power"/>
+        <text class="lbl-power" x="600" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
+        <text class="lbl-faint" x="600" y="205" text-anchor="middle">&rarr; SHEET 4 (ADS1115 VDD)</text>
 
-        <line class="wire wire-power" x1="680" y1="105" x2="680" y2="150"/>
-        <use href="#s2-flag-d" x="680" y="170" class="offpage offpage-power"/>
-        <text class="lbl-power" x="680" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
-        <text class="lbl-faint" x="680" y="205" text-anchor="middle">&rarr; SHEET 3 (ESP32-C3)</text>
+        <line class="wire wire-power" x1="760" y1="105" x2="760" y2="150"/>
+        <use href="#s2-flag-d" x="760" y="170" class="offpage offpage-power"/>
+        <text class="lbl-power" x="760" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
+        <text class="lbl-faint" x="760" y="205" text-anchor="middle">&rarr; SHEET 4 (Hall sensor supply)</text>
 
-        <line class="wire wire-power" x1="820" y1="105" x2="820" y2="150"/>
-        <use href="#s2-flag-d" x="820" y="170" class="offpage offpage-power"/>
-        <text class="lbl-power" x="820" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
-        <text class="lbl-faint" x="820" y="205" text-anchor="middle">&rarr; SHEET 4 (ADS1115 VDD)</text>
+        <text class="lbl-faint" x="680" y="65" text-anchor="middle">note: ESP32-C3 Pro Mini is NOT on this rail — it runs from +5V directly (Sheet 3)</text>
 
-        <line class="wire wire-power" x1="960" y1="105" x2="960" y2="150"/>
-        <use href="#s2-flag-d" x="960" y="170" class="offpage offpage-power"/>
-        <text class="lbl-power" x="960" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
-        <text class="lbl-faint" x="960" y="205" text-anchor="middle">&rarr; SHEET 4 (sensor supply)</text>
-
-        <line class="wire" x1="180" y1="300" x2="960" y2="300"/>
-        <use href="#s2-gnd" x="560" y="300"/>
-        <text class="lbl-faint" x="560" y="335" text-anchor="middle">GND</text>
+        <line class="wire" x1="180" y1="300" x2="760" y2="300"/>
+        <use href="#s2-gnd" x="470" y="300"/>
+        <text class="lbl-faint" x="470" y="335" text-anchor="middle">GND</text>
       </svg>
-      <figcaption>Cascading buck&rarr;LDO keeps LM2596 switching ripple off the 3.3V analog/logic rail; C6 supplies the fast Wi-Fi TX current transients the LDO alone can't slew for.</figcaption>
+      <figcaption>This rail is now dedicated to the ADC domain: ADS1115 VDD and the Hall sensor's ratiometric supply only. The ESP32-C3 Pro Mini runs from +5V directly and regulates itself (Sheet 3).</figcaption>
     </figure>
 
     <ul class="notes">
       <li><b>Why not run the LM2596 straight to 3.3V?</b> The AMS1117's high PSRR filters the buck's switching ripple before it reaches the 16-bit ADC reference &mdash; important given the sub-mV resolution you're after.</li>
-      <li><b>Thermal.</b> At ~0.5A total 3.3V load, U2 dissipates roughly (5V&minus;3.3V)&times;0.5A &asymp; 0.85W &mdash; give the SOT-223 tab copper pour, don't bury it under other parts.</li>
+      <li><b>Light load, no heatsinking needed.</b> With the Pro Mini off this rail, U2 only feeds the ADS1115 (~150&#181;A) and the Hall sensor's excitation current (typically well under 50mA) &mdash; dissipation is negligible.</li>
+      <li><b>Two independent 3.3V domains.</b> This rail and the Pro Mini's own internal 3.3V (from its onboard regulator, Sheet 3) are separate regulators at the same nominal voltage, not the same net &mdash; see Sheet 3 notes on why that's fine for I&sup2;C.</li>
     </ul>
 
     <div class="tblwrap">
@@ -418,7 +409,6 @@
           <tr><td>C3</td><td>Input cap</td><td>10&#181;F tantalum/ceramic</td><td>At U2 VIN</td></tr>
           <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>SOT-223</td></tr>
           <tr><td>C4 / C5</td><td>Output caps</td><td>22&#181;F tantalum + 100nF ceramic</td><td>Required for LDO stability</td></tr>
-          <tr><td>C6</td><td>Bulk cap</td><td>100&ndash;220&#181;F low-ESR</td><td>At ESP32-C3 3V3 pin</td></tr>
         </tbody>
       </table>
     </div>
@@ -429,99 +419,71 @@
   <!-- ============================================================ -->
   <section class="sheet" id="sheet3">
     <div class="sheet-head">
-      <h2>Sheet 3 &mdash; ESP32-C3 module</h2>
-      <span class="sheet-no">RA-1&ndash;03 &middot; Rev A</span>
+      <h2>Sheet 3 &mdash; ESP32-C3 Pro Mini</h2>
+      <span class="sheet-no">RA-1&ndash;03 &middot; Rev B</span>
     </div>
     <figure class="sheet-panel">
-      <svg viewBox="0 0 1040 440" role="img" aria-label="Schematic: ESP32-C3 module with 3.3V decoupling, an EN reset-delay network, a GPIO9 boot-mode pull-up, and I2C SDA/SCL plus an ALERT interrupt line routed off-page to the ADS1115 sheet.">
+      <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: ESP32-C3 Pro Mini board fed directly from the +5V rail, using its own onboard regulation, with only a small optional bulk capacitor added externally, and I2C SDA/SCL plus an ALERT interrupt line routed off-page to the ADS1115 sheet.">
         <defs>
           <pattern id="g3" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
-          <g id="s3-res-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-15"/><rect class="sym-body" x="-8" y="-15" width="16" height="30"/><line class="sym-line" x1="0" y1="15" x2="0" y2="34"/></g>
           <g id="s3-cap-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-5"/><line class="sym-line" x1="-11" y1="-5" x2="11" y2="-5"/><line class="sym-line" x1="-11" y1="5" x2="11" y2="5"/><line class="sym-line" x1="0" y1="5" x2="0" y2="34"/></g>
           <g id="s3-gnd"><line class="sym-line" x1="0" y1="-16" x2="0" y2="0"/><line class="sym-line" x1="-13" y1="0" x2="13" y2="0"/><line class="sym-line" x1="-8" y1="6" x2="8" y2="6"/><line class="sym-line" x1="-4" y1="12" x2="4" y2="12"/></g>
           <g id="s3-dot"><circle class="dot" cx="0" cy="0" r="3.2"/></g>
           <g id="s3-flag-u"><polygon class="offpage" points="-13,24 -13,-24 0,-38 13,-24 13,24"/></g>
           <g id="s3-flag-r"><polygon class="offpage" points="-30,-13 22,-13 36,0 22,13 -30,13"/></g>
         </defs>
-        <rect width="1040" height="440" fill="url(#g3)"/>
+        <rect width="1040" height="340" fill="url(#g3)"/>
 
         <use href="#s3-flag-u" x="140" y="60" class="offpage offpage-power"/>
-        <text class="lbl-power" x="140" y="64" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
-        <text class="lbl-faint" x="140" y="30" text-anchor="middle">SHEET 2 &rarr;</text>
+        <text class="lbl-power" x="140" y="64" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+5V</text>
+        <text class="lbl-faint" x="140" y="30" text-anchor="middle">SHEET 1 &rarr;</text>
         <line class="wire wire-power" x1="140" y1="98" x2="140" y2="145"/>
-        <line class="wire wire-power" x1="140" y1="145" x2="300" y2="145"/>
+        <line class="wire wire-power" x1="140" y1="145" x2="340" y2="145"/>
         <use href="#s3-dot" x="140" y="145"/>
 
         <line class="wire wire-power" x1="140" y1="145" x2="140" y2="176"/>
         <use href="#s3-cap-v" x="140" y="210"/>
-        <text class="lbl" x="108" y="206" text-anchor="end">C7/C8</text>
-        <text class="lbl-dim" x="108" y="220" text-anchor="end">10&#181;F+100nF</text>
-        <line class="wire" x1="140" y1="244" x2="140" y2="400"/>
+        <text class="lbl" x="108" y="206" text-anchor="end">C7</text>
+        <text class="lbl-dim" x="108" y="220" text-anchor="end">47&ndash;100&#181;F</text>
+        <text class="lbl-faint" x="108" y="234" text-anchor="end">optional, extra margin</text>
+        <line class="wire" x1="140" y1="244" x2="140" y2="300"/>
 
-        <!-- EN network -->
-        <line class="wire wire-power" x1="140" y1="145" x2="230" y2="145"/>
-        <line class="wire wire-power" x1="230" y1="145" x2="230" y2="146"/>
-        <use href="#s3-res-v" x="230" y="180"/>
-        <text class="lbl" x="258" y="176">R2</text>
-        <text class="lbl-dim" x="258" y="192">10k</text>
-        <line class="wire" x1="230" y1="145" x2="230" y2="146"/>
-        <line class="wire wire-power" x1="140" y1="145" x2="140" y2="145"/>
-        <line class="wire" x1="230" y1="214" x2="230" y2="240"/>
-        <line class="wire" x1="230" y1="240" x2="300" y2="240"/>
-        <use href="#s3-cap-v" x="230" y="280"/>
-        <text class="lbl" x="258" y="276">C9</text>
-        <text class="lbl-dim" x="258" y="290">1&#181;F</text>
-        <text class="lbl-faint" x="258" y="304">EN power-on delay</text>
-        <line class="wire" x1="230" y1="240" x2="230" y2="246"/>
-        <line class="wire" x1="230" y1="314" x2="230" y2="400"/>
+        <!-- ESP32-C3 Pro Mini body -->
+        <rect class="icbody" x="340" y="120" width="220" height="180"/>
+        <text class="icname" x="450" y="102" text-anchor="middle">U3 &middot; ESP32-C3 Pro Mini</text>
+        <text class="lbl-faint" x="450" y="318" text-anchor="middle">self-regulating board &mdash; 5V/VIN in, no external decoupling/strapping network needed</text>
+        <text class="lbl-dim" x="350" y="165">5V / VIN</text>
+        <text class="lbl-dim" x="350" y="270">GND</text>
+        <text class="lbl-data" x="550" y="200" text-anchor="end">SDA (GPIOx)</text>
+        <text class="lbl-data" x="550" y="240" text-anchor="end">SCL (GPIOy)</text>
+        <text class="lbl-sense" x="550" y="280" text-anchor="end">ALERT (GPIOz)</text>
 
-        <!-- GPIO9 boot strap -->
-        <line class="wire wire-power" x1="270" y1="145" x2="270" y2="146"/>
-        <use href="#s3-res-v" x="270" y="180"/>
-        <text class="lbl" x="298" y="176">R3</text>
-        <text class="lbl-dim" x="298" y="192">10k</text>
-        <line class="wire wire-power" x1="230" y1="146" x2="270" y2="146"/>
-        <line class="wire" x1="270" y1="214" x2="270" y2="280"/>
-        <line class="wire" x1="270" y1="280" x2="300" y2="280"/>
+        <line class="wire" x1="140" y1="300" x2="450" y2="300"/>
+        <use href="#s3-gnd" x="300" y="300"/>
+        <text class="lbl-faint" x="300" y="332" text-anchor="middle">GND</text>
 
-        <!-- ESP32-C3 body -->
-        <rect class="icbody" x="300" y="120" width="220" height="280"/>
-        <text class="icname" x="410" y="102" text-anchor="middle">U3 &middot; ESP32-C3</text>
-        <text class="lbl-faint" x="410" y="418" text-anchor="middle">module &mdash; devkit: feed 3V3 pin directly, bypass onboard LDO</text>
-        <text class="lbl-dim" x="310" y="165">3V3</text>
-        <text class="lbl-dim" x="310" y="205">EN</text>
-        <text class="lbl-dim" x="310" y="245">GPIO9 (BOOT)</text>
-        <text class="lbl-dim" x="310" y="285">GPIO_ALERT-IN</text>
-        <text class="lbl-dim" x="310" y="380">GND</text>
-        <text class="lbl-data" x="510" y="300" text-anchor="end">SDA (GPIOx)</text>
-        <text class="lbl-data" x="510" y="340" text-anchor="end">SCL (GPIOy)</text>
-        <text class="lbl-sense" x="510" y="380" text-anchor="end">ALERT (GPIOz)</text>
+        <line class="wire wire-data" x1="560" y1="200" x2="660" y2="200"/>
+        <use href="#s3-flag-r" x="700" y="200" class="offpage offpage-data"/>
+        <text class="lbl-data" x="695" y="205" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">SDA</text>
 
-        <line class="wire" x1="230" y1="400" x2="520" y2="400"/>
-        <line class="wire" x1="140" y1="400" x2="230" y2="400"/>
-        <use href="#s3-gnd" x="360" y="400"/>
-        <text class="lbl-faint" x="360" y="432" text-anchor="middle">GND</text>
+        <line class="wire wire-data" x1="560" y1="240" x2="660" y2="240"/>
+        <use href="#s3-flag-r" x="700" y="240" class="offpage offpage-data"/>
+        <text class="lbl-data" x="695" y="245" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">SCL</text>
 
-        <line class="wire wire-data" x1="520" y1="300" x2="620" y2="300"/>
-        <use href="#s3-flag-r" x="660" y="300" class="offpage offpage-data"/>
-        <text class="lbl-data" x="655" y="305" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">SDA</text>
-
-        <line class="wire wire-data" x1="520" y1="340" x2="620" y2="340"/>
-        <use href="#s3-flag-r" x="660" y="340" class="offpage offpage-data"/>
-        <text class="lbl-data" x="655" y="345" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">SCL</text>
-
-        <line class="wire wire-sense" x1="520" y1="380" x2="620" y2="380"/>
-        <use href="#s3-flag-r" x="660" y="380" class="offpage offpage-sense"/>
-        <text class="lbl-sense" x="655" y="385" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">ALRT</text>
-        <text class="lbl-faint" x="660" y="410" text-anchor="middle">&rarr; SHEET 4 (ADS1115)</text>
-        <text class="lbl-faint" x="655" y="270" text-anchor="middle">&rarr; SHEET 4 (I&sup2;C bus)</text>
+        <line class="wire wire-sense" x1="560" y1="280" x2="660" y2="280"/>
+        <use href="#s3-flag-r" x="700" y="280" class="offpage offpage-sense"/>
+        <text class="lbl-sense" x="695" y="285" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">ALRT</text>
+        <text class="lbl-faint" x="700" y="310" text-anchor="middle">&rarr; SHEET 4 (ADS1115)</text>
+        <text class="lbl-faint" x="695" y="170" text-anchor="middle">&rarr; SHEET 4 (I&sup2;C bus)</text>
       </svg>
-      <figcaption>Avoid GPIO9 and other strapping pins for anything but their boot-mode role; route SDA/SCL/ALERT to pins your specific module doesn't reserve.</figcaption>
+      <figcaption>Pro Mini runs from +5V and regulates itself internally &mdash; no EN/boot-strap network or dedicated 3.3V decoupling needed externally, unlike a bare ESP32-C3 module.</figcaption>
     </figure>
 
     <ul class="notes">
-      <li><b>Bare module vs. devkit.</b> A bare ESP32-C3 module needs the full decoupling/strapping shown; a devkit already has most of this on-board &mdash; feed its 3V3 pin directly from Sheet 2 and skip R2/C9/R3 if so.</li>
+      <li><b>Why 5V, not 3.3V.</b> The Pro Mini's onboard regulator expects 5V (or similar) on its VIN/5V pin and produces its own internal 3.3V for the chip &mdash; feeding it the AMS1117's 3.3V would bypass that regulator and is not how this board is designed to be powered.</li>
+      <li><b>Two independent 3.3V domains.</b> The Pro Mini's internal 3.3V and the AMS1117's 3.3V (Sheet 2, feeding the ADS1115) are separate regulators at the same nominal voltage &mdash; not the same net. They share only GND. Reference the I&sup2;C pull-ups (Sheet 4) to the <b>ADS1115's</b> 3.3V rail, not the Pro Mini's; standard I&sup2;C works fine across the two domains as long as ground is common.</li>
       <li><b>ALERT/RDY.</b> Wiring the ADS1115's ALERT pin to a spare GPIO lets firmware wait on conversion-ready via interrupt instead of a fixed polling delay across 4 channels.</li>
+      <li><b>Strapping pins.</b> Avoid GPIO9 and other boot-mode strap pins for I&sup2;C/ALERT if your specific Pro Mini variant doesn't already keep them clear.</li>
     </ul>
 
     <div class="tblwrap">
@@ -529,11 +491,8 @@
         <caption>Sheet 3 &mdash; bill of materials</caption>
         <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>U3</td><td>MCU module</td><td>ESP32-C3 (bare or devkit)</td><td>&mdash;</td></tr>
-          <tr><td>R2</td><td>Resistor</td><td>10k&#8486;</td><td>EN pull-up</td></tr>
-          <tr><td>C7 / C8</td><td>Decoupling caps</td><td>10&#181;F + 100nF</td><td>At 3V3 pin</td></tr>
-          <tr><td>C9</td><td>Capacitor</td><td>1&#181;F</td><td>EN power-on delay</td></tr>
-          <tr><td>R3</td><td>Resistor</td><td>10k&#8486;</td><td>GPIO9 (BOOT) pull-up</td></tr>
+          <tr><td>U3</td><td>MCU board</td><td>ESP32-C3 Pro Mini</td><td>Self-regulating, 5V in</td></tr>
+          <tr><td>C7</td><td>Bulk cap</td><td>47&ndash;100&#181;F</td><td>Optional, at 5V input for extra margin</td></tr>
         </tbody>
       </table>
     </div>
@@ -545,10 +504,10 @@
   <section class="sheet" id="sheet4">
     <div class="sheet-head">
       <h2>Sheet 4 &mdash; ADS1115 &amp; sensor interface</h2>
-      <span class="sheet-no">RA-1&ndash;04 &middot; Rev A</span>
+      <span class="sheet-no">RA-1&ndash;04 &middot; Rev B</span>
     </div>
     <figure class="sheet-panel">
-      <svg viewBox="0 0 1160 1140" role="img" aria-label="Schematic: ADS1115 ADC with I2C pull-ups and ADDR tied low, four identical RC anti-alias filter and dual diode clamp networks on AIN0 through AIN3, a five-pin Kelvin-sense connector to the rudder angle sensor, and a two-pin connector to the floating sensor.">
+      <svg viewBox="0 0 1160 1140" role="img" aria-label="Schematic: ADS1115 ADC with I2C pull-ups and ADDR tied low. AIN0 reads the Hall angle sensor through an RC filter and diode clamp. AIN1 reads a 5V-biased resistive divider (510 ohm fixed resistor on-board, 0 to 190 ohm float sender remote at the tank) through the same filter and clamp. AIN2 and AIN3 are Kelvin-sense lines back to the Hall sensor's own supply and ground pins, each with matching filter and clamp networks, connected through a five-pin connector to the sensor.">
         <defs>
           <pattern id="g4" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
           <g id="s4-res-h"><line class="sym-line" x1="-34" y1="0" x2="-15" y2="0"/><rect class="sym-body" x="-15" y="-8" width="30" height="16"/><line class="sym-line" x1="15" y1="0" x2="34" y2="0"/></g>
@@ -642,7 +601,7 @@
         <line class="wire wire-sense" x1="740" y1="185" x2="1000" y2="185"/>
         <text class="lbl-sense" x="900" y="172" text-anchor="middle">AIN0 &middot; RUDDER ANGLE SIGNAL</text>
 
-        <!-- AIN1 y=430 -->
+        <!-- AIN1 y=425 : float sensor, 5V-biased divider (R1 on-board, R2 = remote sender) -->
         <line class="wire wire-sense" x1="600" y1="425" x2="660" y2="425"/>
         <use href="#s4-res-h" x="700" y="425" class="wire-sense"/>
         <text class="lbl-faint" x="700" y="402" text-anchor="middle">R7 10k</text>
@@ -659,14 +618,52 @@
         <use href="#s4-diode-sm-catU" x="740" y="503"/>
         <line class="wire" x1="740" y1="519" x2="740" y2="530"/>
         <use href="#s4-gnd" x="740" y="530"/>
-        <line class="wire wire-sense" x1="740" y1="425" x2="1000" y2="425"/>
-        <text class="lbl-sense" x="900" y="412" text-anchor="middle">AIN1 &middot; FLOATING SENSOR SIGNAL</text>
+        <text class="lbl-faint" x="740" y="558" text-anchor="middle">clamp: protects vs. ADS1115 VDD, not the divider's own 5V</text>
+        <line class="wire wire-sense" x1="740" y1="425" x2="800" y2="425"/>
+
+        <!-- R1 fixed bias resistor from +5V -->
+        <use href="#s4-flag-u-sm" x="800" y="335" class="offpage offpage-power"/>
+        <text class="lbl-power" x="800" y="315" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">+5V</text>
+        <line class="wire wire-power" x1="800" y1="349" x2="800" y2="391"/>
+        <use href="#s4-res-v" x="800" y="425"/>
+        <text class="lbl" x="826" y="410">R1</text>
+        <text class="lbl-dim" x="826" y="426">510&#8486;</text>
+        <use href="#s4-dot" x="800" y="425"/>
+        <line class="wire wire-sense" x1="800" y1="425" x2="830" y2="425"/>
+
+        <!-- J3 connector to remote tank sender -->
+        <rect class="sym-body" x="830" y="400" width="60" height="50"/>
+        <text class="lbl-faint" x="860" y="392" text-anchor="middle">J3</text>
+        <text class="lbl-faint" x="860" y="468" text-anchor="middle">2-pin, to tank sender</text>
+        <line class="wire" x1="860" y1="450" x2="860" y2="478"/>
+        <use href="#s4-gnd" x="860" y="478"/>
+        <line class="wire wire-sense" x1="890" y1="425" x2="950" y2="425"/>
+
+        <!-- R2: the float sender itself, variable, remote at the tank -->
+        <use href="#s4-dot" x="950" y="425"/>
+        <use href="#s4-res-v" x="950" y="459"/>
+        <line class="sym-line" x1="936" y1="475" x2="964" y2="443" stroke="currentColor" stroke-width="2"/>
+        <polygon class="sym-fill" points="964,443 958,445 962,451"/>
+        <text class="lbl" x="978" y="410">R2</text>
+        <text class="lbl-dim" x="978" y="426">float sender</text>
+        <text class="lbl-dim" x="978" y="442">0&ndash;190&#8486;</text>
+        <text class="lbl-faint" x="978" y="458">(remote, at tank)</text>
+        <line class="wire" x1="950" y1="493" x2="950" y2="510"/>
+        <use href="#s4-gnd" x="950" y="510"/>
+
+        <text class="lbl-sense" x="900" y="360" text-anchor="middle">AIN1 &middot; FLOAT SENSOR &mdash; 5V DIVIDER, 0&ndash;1.4V</text>
+        <text class="lbl-faint" x="900" y="376" text-anchor="middle">Vout = 5V &times; R2/(R1+R2)  &mdash;  0&#8486;&rarr;0V, 190&#8486;&rarr;1.36V</text>
 
         <!-- AIN2 y=670 : sensor supply Kelvin sense -->
         <line class="wire wire-sense" x1="600" y1="665" x2="660" y2="665"/>
         <use href="#s4-res-h" x="700" y="665" class="wire-sense"/>
         <text class="lbl-faint" x="700" y="642" text-anchor="middle">R8 10k</text>
         <line class="wire wire-sense" x1="734" y1="665" x2="740" y2="665"/>
+        <use href="#s4-flag-u-sm" x="740" y="580" class="offpage offpage-power"/>
+        <text class="lbl-power" x="740" y="560" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">+3V3</text>
+        <line class="wire wire-power" x1="740" y1="594" x2="740" y2="605"/>
+        <use href="#s4-diode-sm-catU" x="740" y="621" class="wire-power"/>
+        <line class="wire" x1="740" y1="637" x2="740" y2="665"/>
         <line class="wire" x1="740" y1="665" x2="740" y2="679"/>
         <use href="#s4-cap-sm" x="740" y="695"/>
         <text class="lbl-faint" x="762" y="699">C13 1&#181;F</text>
@@ -677,20 +674,29 @@
         <line class="wire wire-sense" x1="740" y1="665" x2="1000" y2="665"/>
         <text class="lbl-sense" x="900" y="652" text-anchor="middle">AIN2 &middot; SENSOR SUPPLY SENSE (Kelvin)</text>
 
-        <!-- AIN3 y=910 : sensor ground Kelvin sense — no tie to system GND bus -->
+        <!-- AIN3 y=910 : sensor ground Kelvin sense — clamp diodes only, no hard tie to system GND bus -->
         <line class="wire wire-sense" x1="600" y1="905" x2="660" y2="905"/>
         <use href="#s4-res-h" x="700" y="905" class="wire-sense"/>
         <text class="lbl-faint" x="700" y="882" text-anchor="middle">R9 10k</text>
         <line class="wire wire-sense" x1="734" y1="905" x2="740" y2="905"/>
+        <use href="#s4-flag-u-sm" x="740" y="820" class="offpage offpage-power"/>
+        <text class="lbl-power" x="740" y="800" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">+3V3</text>
+        <line class="wire wire-power" x1="740" y1="834" x2="740" y2="845"/>
+        <use href="#s4-diode-sm-catU" x="740" y="861" class="wire-power"/>
+        <line class="wire" x1="740" y1="877" x2="740" y2="905"/>
         <line class="wire" x1="740" y1="905" x2="740" y2="919"/>
         <use href="#s4-cap-sm" x="740" y="935"/>
         <text class="lbl-faint" x="762" y="939">C14 1&#181;F</text>
-        <text class="lbl-faint" x="740" y="975" text-anchor="middle">clamps only outside normal range &mdash;</text>
-        <text class="lbl-faint" x="740" y="990" text-anchor="middle">does not tie this line to GND otherwise</text>
+        <line class="wire" x1="740" y1="951" x2="740" y2="967"/>
+        <use href="#s4-diode-sm-catU" x="740" y="983"/>
+        <line class="wire" x1="740" y1="999" x2="740" y2="1010"/>
+        <use href="#s4-gnd" x="740" y="1010"/>
         <line class="wire wire-sense" x1="740" y1="905" x2="1000" y2="905"/>
         <text class="lbl-sense" x="900" y="892" text-anchor="middle">AIN3 &middot; SENSOR GROUND SENSE (Kelvin, floating)</text>
+        <text class="lbl-faint" x="900" y="970" text-anchor="middle">clamp diodes conduct only outside normal</text>
+        <text class="lbl-faint" x="900" y="985" text-anchor="middle">range &mdash; don't tie this line to GND otherwise</text>
 
-        <text class="lbl-faint" x="900" y="1055" text-anchor="middle">clamp diode pairs D3&ndash;D10: BAT54S dual packages (one +3V3 leg / one GND leg per channel, as drawn for AIN0/AIN1)</text>
+        <text class="lbl-faint" x="900" y="1055" text-anchor="middle">clamp diode pairs D3&ndash;D10: BAT54S dual packages (one +3V3 leg / one GND leg per channel, all four AINx)</text>
 
         <!-- J2 sensor connector -->
         <rect class="sym-body" x="1000" y="90" width="90" height="880"/>
@@ -708,20 +714,22 @@
           <rect x="820" y="1070" width="240" height="60"/>
           <text x="830" y="1086" class="tb-strong">RA-1 &middot; ADC + SENSOR</text>
           <text x="830" y="1102" >SHEET 4 OF 4</text>
-          <text x="830" y="1118">REV A</text>
+          <text x="830" y="1118">REV B</text>
           <text x="980" y="1102">SIZE A3</text>
           <text x="980" y="1118">SCALE NONE</text>
         </g>
         <text class="lbl-faint" x="80" y="1085">Firmware: angle_ratio = (AIN0 &minus; AIN3) &divide; (AIN2 &minus; AIN3)</text>
         <text class="lbl-faint" x="80" y="1103">&mdash; cancels regulator drift and cable IR drop using the two Kelvin-sense channels.</text>
       </svg>
-      <figcaption>All four ADC channels share one RC anti-alias filter + dual-diode clamp topology (drawn in full on AIN0/AIN1; AIN2/AIN3 repeat it identically). AIN2/AIN3 are wired as true Kelvin sense lines back to the sensor's own supply/ground pins &mdash; a 5-conductor cable, not 3.</figcaption>
+      <figcaption>All four ADC channels share one RC anti-alias filter + dual-diode clamp topology, referenced to the ADS1115's own +3V3 rail regardless of what biases the signal. AIN1's divider runs off +5V; AIN2/AIN3 are true Kelvin sense lines back to the Hall sensor's own supply/ground pins.</figcaption>
     </figure>
 
     <ul class="notes">
-      <li><b>Gain.</b> Set the ADS1115 PGA to &plusmn;4.096V (gain=1) on every channel &mdash; comfortably covers 0&ndash;3.3V with ~125&#181;V/step resolution.</li>
+      <li><b>No op-amp needed.</b> The AIN1 divider's Thevenin source impedance tops out around 138&#8486; (at R2=190&#8486;) &mdash; trivial next to the ADS1115's input, and the 10k&#8486; anti-alias resistor already dominates. A buffer would add a part and a failure point without fixing anything real. If the tank cable run is long and noisy, an optional MCP6001 follower between the divider node and R7 is the one case worth keeping as a footprint.</li>
+      <li><b>Gain.</b> AIN0/AIN2/AIN3 comfortably use &plusmn;4.096V (gain=1). For AIN1, whose signal only reaches ~1.4V, set a higher per-conversion PGA gain (e.g. &plusmn;2.048V) to roughly double effective resolution &mdash; free, since the ADS1115 lets you change gain per channel.</li>
       <li><b>Mux settling.</b> Discard the first conversion after each channel switch; the ADS1115 has one ADC core behind a single mux.</li>
-      <li><b>J2 wiring is the key design choice.</b> If a 5-conductor run to the sensor isn't practical, AIN2/AIN3 can instead tap the local 3.3V rail and local GND at the enclosure &mdash; still catches regulator drift, but not cable drop.</li>
+      <li><b>Confirm your sender's curve.</b> R2 = 0&ndash;190&#8486; matches a common European/VDO-style fuel or water sender; some senders run 0&ndash;90&#8486; or reversed &mdash; check yours before committing to R1 = 510&#8486;.</li>
+      <li><b>J2 wiring is the key design choice for the Hall sensor.</b> If a 5-conductor run isn't practical, AIN2/AIN3 can instead tap the local 3.3V rail and local ground at the enclosure &mdash; still catches regulator drift, but not cable drop.</li>
       <li><b>Cable practice.</b> Twisted pair per signal+return, overall shield grounded at the electronics end only, routed clear of the LM2596 switching loop on Sheet 1.</li>
     </ul>
 
@@ -736,8 +744,10 @@
           <tr><td>R6&ndash;R9</td><td>Series filter resistors</td><td>10k&#8486; &times;4</td><td>One per AINx</td></tr>
           <tr><td>C11&ndash;C14</td><td>Filter caps</td><td>1&#181;F &times;4</td><td>~16Hz anti-alias, one per AINx</td></tr>
           <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4 packages</td><td>ESD/transient protection, one per AINx</td></tr>
-          <tr><td>J2</td><td>Sensor connector</td><td>5-pin</td><td>Supply, Sig, +Sense, GND, &minus;Sense</td></tr>
-          <tr><td>J3</td><td>Floating sensor connector</td><td>2-pin</td><td>Sig, GND</td></tr>
+          <tr><td>R1</td><td>Divider bias resistor</td><td>510&#8486;</td><td>+5V to AIN1 divider node</td></tr>
+          <tr><td>R2</td><td>Float sender (not a board part)</td><td>0&ndash;190&#8486; variable</td><td>Remote, at the tank</td></tr>
+          <tr><td>J2</td><td>Hall sensor connector</td><td>5-pin</td><td>Supply, Sig, +Sense, GND, &minus;Sense</td></tr>
+          <tr><td>J3</td><td>Float sender connector</td><td>2-pin</td><td>Sig, GND, to remote R2</td></tr>
         </tbody>
       </table>
     </div>
@@ -749,7 +759,7 @@
   <section class="sheet" id="bom">
     <div class="sheet-head">
       <h2>Full bill of materials</h2>
-      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev A</span>
+      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev B</span>
     </div>
     <div class="tblwrap">
       <table>
@@ -768,18 +778,18 @@
           <tr><td>C3</td><td>Input cap</td><td>10&#181;F</td><td>2</td></tr>
           <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>2</td></tr>
           <tr><td>C4/C5</td><td>Output caps</td><td>22&#181;F + 100nF</td><td>2</td></tr>
-          <tr><td>C6</td><td>Bulk cap</td><td>100&ndash;220&#181;F</td><td>2</td></tr>
-          <tr><td>U3</td><td>MCU module</td><td>ESP32-C3</td><td>3</td></tr>
-          <tr><td>R2/R3</td><td>Resistors</td><td>10k&#8486; &times;2</td><td>3</td></tr>
-          <tr><td>C7/C8/C9</td><td>Capacitors</td><td>10&#181;F, 100nF, 1&#181;F</td><td>3</td></tr>
+          <tr><td>U3</td><td>MCU board</td><td>ESP32-C3 Pro Mini</td><td>3</td></tr>
+          <tr><td>C7</td><td>Bulk cap</td><td>47&ndash;100&#181;F (optional)</td><td>3</td></tr>
           <tr><td>U4</td><td>16-bit ADC</td><td>ADS1115</td><td>4</td></tr>
           <tr><td>R4/R5</td><td>I&sup2;C pull-ups</td><td>4.7k&#8486; &times;2</td><td>4</td></tr>
           <tr><td>R6&ndash;R9</td><td>Filter resistors</td><td>10k&#8486; &times;4</td><td>4</td></tr>
           <tr><td>C10</td><td>Decoupling cap</td><td>0.1&#181;F</td><td>4</td></tr>
           <tr><td>C11&ndash;C14</td><td>Filter caps</td><td>1&#181;F &times;4</td><td>4</td></tr>
           <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4</td><td>4</td></tr>
-          <tr><td>J2</td><td>Sensor connector</td><td>5-pin</td><td>4</td></tr>
-          <tr><td>J3</td><td>Floating sensor connector</td><td>2-pin</td><td>4</td></tr>
+          <tr><td>R1</td><td>Divider bias resistor</td><td>510&#8486;</td><td>4</td></tr>
+          <tr><td>R2</td><td>Float sender (remote)</td><td>0&ndash;190&#8486; variable</td><td>4</td></tr>
+          <tr><td>J2</td><td>Hall sensor connector</td><td>5-pin</td><td>4</td></tr>
+          <tr><td>J3</td><td>Float sender connector</td><td>2-pin</td><td>4</td></tr>
         </tbody>
       </table>
     </div>
@@ -792,5 +802,5 @@
 </div>
 
 <footer>
-  RA-1 Rudder Angle Indicator &middot; Rev A &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
+  RA-1 Rudder Angle Indicator &middot; Rev B &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
 </footer>
