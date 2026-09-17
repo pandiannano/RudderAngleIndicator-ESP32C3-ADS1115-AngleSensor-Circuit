@@ -110,11 +110,22 @@ This 3.3V rail is now dedicated to the ADC side of the board — it powers **onl
 
 Thermal check: at this rail's much lighter load now (ADS1115 ~150 µA + Hall sensor excitation current, typically well under 50 mA total), the AMS1117 runs cool — no heatsinking concerns.
 
+### 4a. FB3 — isolating AVDD, and why there's no matching ground-side ferrite
+
+Downstream of C4/C5 (which must stay directly at the LDO's own output pin for loop stability), add a **ferrite bead (FB3)** in series before the rail becomes **AVDD** — the dedicated analog supply feeding the ADS1115 and the Hall sensor — with a small local decoupling cap (**C6**, 1µF, 0805) right after the bead. This is a standard, low-risk mixed-signal technique: it blocks any residual high-frequency noise from ever reaching the analog supply, on top of what the AMS1117's own PSRR already filters.
+
+| Component | Value / notes | SMD package |
+|---|---|---|
+| FB3 | Ferrite bead, ~100Ω @ 100MHz (e.g. BLM18-series) | 0603 |
+| C6 | Decoupling cap, 1µF ceramic | 0805 |
+
+**What this design deliberately does *not* do: a matching ground-side ferrite (an "FB4" splitting GND into GND/AGND).** That's a real technique too, but it's a much bigger risk on a 2-layer board, which has only one copper pour doing double duty as the return path for every signal on the board. Any trace that ends up crossing the split forces its return current the long way around through the bead — which can make EMI and noise coupling *worse*, not better, and is a classic layout mistake. This design gets its isolation from FB3 alone, plus keeping the ADS1115/sensor front-end physically grouped away from the LM2596 and the ESP32-C3 on one unbroken ground pour (§8). Revisit a ground-side split if you ever move to a 4-layer board with a dedicated ground plane — it's a much safer technique there.
+
 ## 5. ADS1115 wiring
 
 - U4: **VSSOP-10** (also marked MSOP-10), 3×3mm — the ADS1115's standard SMD package.
-- VDD from the dedicated 3.3V rail (AMS1117 output, ADC domain).
-- I2C: SDA/SCL to ESP32-C3 Pro Mini GPIOs, 4.7kΩ pull-ups to the ADS1115's 3.3V rail (only one set on the bus — most ADS1115 breakout boards already include them). See §7 for why pull-ups reference this rail specifically, given the Pro Mini has its own separate 3.3V.
+- VDD from **AVDD** — the AMS1117 output, filtered through FB3 (§4a).
+- I2C: SDA/SCL to ESP32-C3 Pro Mini GPIOs, 4.7kΩ pull-ups to AVDD (only one set on the bus — most ADS1115 breakout boards already include them). See §7 for why pull-ups reference this rail specifically, given the Pro Mini has its own separate 3.3V.
 - ADDR pin tied to GND for default address 0x48.
 - ALERT/RDY routed to a spare GPIO (recommended): lets firmware wait for conversion-ready via interrupt instead of polling/fixed delay, which matters since you're round-robining 4 channels.
 - Decoupling: 0.1 µF ceramic directly at VDD pin.
@@ -138,7 +149,7 @@ Pick R/C for cutoff well below the ADS1115 conversion rate but well above the se
 
 **Default SMD sizes for this section:** series R and filter C → **0805**; BAT54S clamp pairs → **SOT-23**. Drop to 0603 across the board if you're reflow- rather than hand-soldering and want a tighter layout. The filter cap and the clamp-to-GND diode are two independent branches off the signal node landing on GND in parallel — not chained through each other (see Sheet 4 of the schematic for the corrected topology).
 
-- **AIN0 – Rudder angle**: Hall sensor signal output, ratiometric 0–3.3V, supplied from the AMS1117 3.3V rail.
+- **AIN0 – Rudder angle**: Hall sensor signal output, ratiometric 0–3.3V, supplied from AVDD.
 - **AIN1 – Float sensor**: see §6a — a resistive divider output, 0–1.4V, biased from the **5V** rail (not 3.3V).
 - **AIN2 – Sensor supply sense**: a dedicated wire back from the Hall sensor's actual supply pin (Kelvin sense), *not* just tapped at the regulator. This is what lets you detect cable IR drop or connector resistance.
 - **AIN3 – Sensor ground sense**: a dedicated wire back from the Hall sensor's actual ground pin, referenced to the ADS1115's own GND. Any non-zero reading here is the IR drop / offset in the return conductor.
@@ -172,7 +183,7 @@ The float sender is a variable resistor, 0–190Ω across its travel (standard E
 
 R1 (510Ω, on-board): **0805**. R2 (the sender itself) isn't a PCB part — it's a remote, panel-mounted variable resistor at the tank, wired in via J3 (a 2.5mm-pitch locking header, e.g. JST-XH, through-hole).
 
-That ~1.4V max lands comfortably inside the ADS1115's absolute input range even though the ADC itself runs on the separate 3.3V rail (max allowed input ≈ VDD + 0.3V ≈ 3.6V) — there's no scaling hazard here.
+That ~1.4V max lands comfortably inside the ADS1115's absolute input range even though the ADC itself runs on the separate AVDD rail (max allowed input ≈ VDD + 0.3V ≈ 3.6V) — there's no scaling hazard here.
 
 **Do you need an op-amp?** No. The divider's Thevenin source impedance tops out around R1∥R2 ≈ 138Ω (at R2 = 190Ω) — trivially low next to the ADS1115's recommended source impedance, and the anti-alias resistor you're already adding (R 4.7–10kΩ) dominates the total source impedance anyway. A unity-gain op-amp buffer would add a component, a supply rail for the op-amp itself, and another failure point without fixing anything real here.
 
@@ -189,12 +200,12 @@ The Pro Mini form-factor board carries its own onboard regulator, so it's wired 
 - A modest bulk cap (47–100 µF, SMD radial can ⌀6.3×5.4 to ⌀8×10.5mm) at the Pro Mini's 5V input is cheap insurance against wiring inductance and the board's own Wi-Fi TX current transients, even though it has on-board decoupling already.
 - Its 3V3 pin (if broken out) is that onboard regulator's *output* — usable for a small extra peripheral if needed, but not a substitute for the dedicated AMS1117 rail powering the ADS1115.
 
-**Two independent 3.3V domains.** The Pro Mini's internal 3.3V (from its own onboard LDO) and the AMS1117's 3.3V (feeding the ADS1115) are two separately regulated rails that happen to be the same nominal voltage — they are **not** the same net, and should not be tied together. What ties the two boards together electrically is a common **GND** (star-grounded, §8) and the I2C bus. Reference the I2C pull-ups (4.7kΩ) to the **ADS1115's** 3.3V rail, not the Pro Mini's — the Pro Mini's GPIOs read/drive against its own internal ~3.3V logic levels, which are close enough to the ADS1115's independently-regulated 3.3V for standard I2C to work correctly across the two domains, as long as ground is common.
+**Two independent 3.3V domains.** The Pro Mini's internal 3.3V (from its own onboard LDO) and AVDD (the AMS1117's output, filtered through FB3, feeding the ADS1115) are two separately regulated rails that happen to be the same nominal voltage — they are **not** the same net, and should not be tied together. What ties the two boards together electrically is a common **GND** (§8 — one unbroken plane, not a star of separate segments) and the I2C bus. Reference the I2C pull-ups (4.7kΩ) to **AVDD**, not the Pro Mini's 3.3V — the Pro Mini's GPIOs read/drive against its own internal ~3.3V logic levels, which are close enough to AVDD for standard I2C to work correctly across the two domains, as long as ground is common.
 - Avoid GPIO9 (boot-mode strap) for I2C if your board's silkscreen doesn't already reserve alternate pins.
 
 ## 8. Grounding & layout notes
 
-- Single-point ("star") ground: tie power-stage ground, digital ground, and ADC/analog ground together at one point near the ADS1115, rather than daisy-chaining ground copper through the buck converter.
+- Keep GND **one unbroken copper pour** across the whole 2-layer board — don't cut it into separate power/digital/analog islands (see §4a on why a ground-side ferrite is skipped here). Get the star-ground *effect* through placement instead: group the ADS1115 and sensor front-end together, and route so their return currents converge near the ADS1115 rather than crossing through the buck converter's high-current loop.
 - Keep the LM2596's switching loop (inductor–diode–input cap) physically tight and away from the ADS1115 and sensor wiring.
 - Route the sensor cable as a twisted pair (signal+ground) with the sense wires twisted with their respective conductor; use overall shield grounded at the electronics end only (avoid ground loops).
 - Add a 100Ω series resistor on I2C lines if traces/wires to the ADS1115 are long, to damp ringing.

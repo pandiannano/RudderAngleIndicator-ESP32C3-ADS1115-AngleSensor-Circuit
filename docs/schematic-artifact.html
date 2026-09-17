@@ -106,10 +106,10 @@
 <header class="hero">
   <p class="kicker">Drawing set &middot; 4 sheets + BOM</p>
   <h1>Rudder angle indicator &mdash; full schematic</h1>
-  <p class="lede">ESP32-C3 Pro Mini + ADS1115, powered from a 12&ndash;24V DC bus of unknown polarity through a bridge-rectifier input stage and an LM2596 buck. Two independent regulated rails: +5V runs the Pro Mini (self-regulating) and biases the float-sensor divider; +3.3V (AMS1117) is dedicated to the ADC and the Hall sensor's ratiometric supply.</p>
+  <p class="lede">ESP32-C3 Pro Mini + ADS1115, powered from a 12&ndash;24V DC bus of unknown polarity through a bridge-rectifier input stage and an LM2596 buck. Two independent regulated rails: +5V runs the Pro Mini (self-regulating) and biases the float-sensor divider; +3.3V (AMS1117) feeds AVDD &mdash; a ferrite-isolated analog supply dedicated to the ADC and the Hall sensor's ratiometric supply, sharing one unbroken ground plane with the rest of the board.</p>
   <div class="doc-meta">
     <span><b>Project</b> RA-1 Rudder Angle Indicator</span>
-    <span><b>Rev</b> E</span>
+    <span><b>Rev</b> F</span>
     <span><b>Sheets</b> 1&ndash;4 of 4</span>
     <span><b>MCU</b> ESP32-C3 Pro Mini</span>
     <span><b>ADC</b> ADS1115</span>
@@ -133,7 +133,7 @@
   <div id="legend">
     <div class="legend">
       <div class="legend-item"><span class="swatch" style="background:var(--ink)"></span>Ground / chassis common</div>
-      <div class="legend-item"><span class="swatch" style="background:var(--power)"></span>DC power rail (input, +5V, +3V3)</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--power)"></span>DC power rail (input, +5V, AVDD)</div>
       <div class="legend-item"><span class="swatch" style="background:var(--data)"></span>Digital bus (I&sup2;C, ALERT)</div>
       <div class="legend-item"><span class="swatch" style="background:var(--sense)"></span>Analog sensor / Kelvin-sense line</div>
     </div>
@@ -154,7 +154,7 @@
   <section class="sheet" id="sheet1">
     <div class="sheet-head">
       <h2>Sheet 1 &mdash; Power input &amp; LM2596 buck (12/24V &rarr; 5V)</h2>
-      <span class="sheet-no">RA-1&ndash;01 &middot; Rev E</span>
+      <span class="sheet-no">RA-1&ndash;01 &middot; Rev F</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1300 480" role="img" aria-label="Schematic: two-pin DC input of unknown polarity feeding a fuse and a full bridge rectifier wired across both input legs, so the rectifier's output is always correct polarity regardless of how the input is wired. A unidirectional TVS diode and bulk capacitor follow the rectifier, then an LM2596 buck regulator producing a regulated +5V rail with an output inductor, catch diode, output filter capacitors, and a feedback jumper wired to the true regulated output.">
@@ -303,7 +303,7 @@
           <rect x="920" y="404" width="300" height="66"/>
           <text x="930" y="420" class="tb-strong">RA-1 &middot; POWER INPUT</text>
           <text x="930" y="436">SHEET 1 OF 4</text>
-          <text x="930" y="452">REV E</text>
+          <text x="930" y="452">REV F</text>
           <text x="1120" y="436">SIZE A4</text>
           <text x="1120" y="452">SCALE NONE</text>
         </g>
@@ -346,10 +346,10 @@
   <section class="sheet" id="sheet2">
     <div class="sheet-head">
       <h2>Sheet 2 &mdash; AMS1117-3.3 LDO &amp; rail distribution (5V &rarr; 3.3V)</h2>
-      <span class="sheet-no">RA-1&ndash;02 &middot; Rev E</span>
+      <span class="sheet-no">RA-1&ndash;02 &middot; Rev F</span>
     </div>
     <figure class="sheet-panel">
-      <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: 5V rail from Sheet 1 feeding an AMS1117-3.3 linear regulator with input and output decoupling capacitors, producing a clean 3.3V rail dedicated to the ADC domain, fanning out only to the ADS1115 VDD and the Hall sensor supply on Sheet 4 — the ESP32-C3 Pro Mini is not on this rail.">
+      <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: 5V rail from Sheet 1 feeding an AMS1117-3.3 linear regulator with input and output decoupling capacitors, producing a 3.3V rail. A ferrite bead (FB3) filters this rail before it becomes AVDD, the isolated analog supply feeding the ADS1115 and the Hall sensor, with a local decoupling capacitor after the bead. Ground stays a single unified net across the whole board — deliberately not split by a matching ground-side ferrite. The ESP32-C3 Pro Mini is not on this rail.">
         <defs>
           <pattern id="g2" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
           <g id="s2-cap-v"><line class="sym-line" x1="0" y1="-34" x2="0" y2="-5"/><line class="sym-line" x1="-11" y1="-5" x2="11" y2="-5"/><line class="sym-line" x1="-11" y1="5" x2="11" y2="5"/><line class="sym-line" x1="0" y1="5" x2="0" y2="34"/></g>
@@ -357,6 +357,7 @@
           <g id="s2-dot"><circle class="dot" cx="0" cy="0" r="3.2"/></g>
           <g id="s2-flag-l"><polygon class="offpage" points="30,-13 -22,-13 -36,0 -22,13 30,13"/></g>
           <g id="s2-flag-d"><polygon class="offpage" points="-24,-11 24,-11 24,6 0,20 -24,6"/></g>
+          <g id="s2-fb-h"><line class="sym-line" x1="-34" y1="0" x2="-20" y2="0"/><rect class="sym-body" x="-20" y="-9" width="40" height="18"/><line class="sym-line" x1="20" y1="0" x2="34" y2="0"/></g>
         </defs>
         <rect width="1040" height="340" fill="url(#g2)"/>
 
@@ -390,29 +391,48 @@
         <text class="lbl-dim" x="470" y="290" text-anchor="middle">22&#181;F + 100nF</text>
         <line class="wire" x1="470" y1="264" x2="470" y2="300"/>
 
-        <line class="wire wire-power" x1="470" y1="105" x2="760" y2="105"/>
+        <line class="wire wire-power" x1="470" y1="105" x2="500" y2="105"/>
 
-        <line class="wire wire-power" x1="600" y1="105" x2="600" y2="150"/>
-        <use href="#s2-flag-d" x="600" y="170" class="offpage offpage-power"/>
-        <text class="lbl-power" x="600" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
-        <text class="lbl-faint" x="600" y="205" text-anchor="middle">&rarr; SHEET 4 (ADS1115 VDD)</text>
+        <!-- FB3: ferrite bead isolating AVDD from the shared 3.3V rail -->
+        <use href="#s2-fb-h" x="520" y="105" class="wire-power"/>
+        <text class="lbl" x="520" y="78" text-anchor="middle">FB3</text>
+        <text class="lbl-dim" x="520" y="132" text-anchor="middle">ferrite</text>
 
-        <line class="wire wire-power" x1="760" y1="105" x2="760" y2="150"/>
-        <use href="#s2-flag-d" x="760" y="170" class="offpage offpage-power"/>
-        <text class="lbl-power" x="760" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
-        <text class="lbl-faint" x="760" y="205" text-anchor="middle">&rarr; SHEET 4 (Hall sensor supply)</text>
+        <line class="wire wire-power" x1="554" y1="105" x2="600" y2="105"/>
+        <use href="#s2-dot" x="600" y="105"/>
+        <line class="wire wire-power" x1="600" y1="105" x2="600" y2="196"/>
+        <use href="#s2-cap-v" x="600" y="230"/>
+        <text class="lbl" x="600" y="276" text-anchor="middle">C6</text>
+        <text class="lbl-dim" x="600" y="290" text-anchor="middle">1&#181;F</text>
+        <line class="wire" x1="600" y1="264" x2="600" y2="300"/>
+        <text class="lbl-faint" x="600" y="65" text-anchor="middle">local decoupling right after the bead</text>
 
-        <text class="lbl-faint" x="680" y="65" text-anchor="middle">note: ESP32-C3 Pro Mini is NOT on this rail — it runs from +5V directly (Sheet 3)</text>
+        <line class="wire wire-power" x1="600" y1="105" x2="820" y2="105"/>
 
-        <line class="wire" x1="180" y1="300" x2="760" y2="300"/>
+        <line class="wire wire-power" x1="660" y1="105" x2="660" y2="150"/>
+        <use href="#s2-flag-d" x="660" y="170" class="offpage offpage-power"/>
+        <text class="lbl-power" x="660" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">AVDD</text>
+        <text class="lbl-faint" x="660" y="205" text-anchor="middle">&rarr; SHEET 4 (ADS1115 VDD)</text>
+
+        <line class="wire wire-power" x1="820" y1="105" x2="820" y2="150"/>
+        <use href="#s2-flag-d" x="820" y="170" class="offpage offpage-power"/>
+        <text class="lbl-power" x="820" y="176" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">AVDD</text>
+        <text class="lbl-faint" x="820" y="205" text-anchor="middle">&rarr; SHEET 4 (Hall sensor supply)</text>
+
+        <text class="lbl-faint" x="740" y="40" text-anchor="middle">note: ESP32-C3 Pro Mini is NOT on this rail — it runs from +5V directly (Sheet 3)</text>
+
+        <line class="wire" x1="180" y1="300" x2="820" y2="300"/>
         <use href="#s2-gnd" x="470" y="300"/>
         <text class="lbl-faint" x="470" y="335" text-anchor="middle">GND</text>
+        <text class="lbl-faint" x="700" y="320" text-anchor="middle" font-size="10">GND stays ONE net here &mdash; no ground-side ferrite (see notes)</text>
       </svg>
-      <figcaption>This rail is now dedicated to the ADC domain: ADS1115 VDD and the Hall sensor's ratiometric supply only. The ESP32-C3 Pro Mini runs from +5V directly and regulates itself (Sheet 3).</figcaption>
+      <figcaption>C4/C5 stay directly at the LDO's own output pin for loop stability; FB3 sits downstream of them, so it filters the rail feeding AVDD without disturbing the LDO's stability network. Ground is a single unified net across the whole board &mdash; deliberately no ground-side ferrite to match.</figcaption>
     </figure>
 
     <ul class="notes">
       <li><b>Why not run the LM2596 straight to 3.3V?</b> The AMS1117's high PSRR filters the buck's switching ripple before it reaches the 16-bit ADC reference &mdash; important given the sub-mV resolution you're after.</li>
+      <li><b>FB3: yes, worth adding.</b> A ferrite bead between the shared 3.3V node and AVDD (the ADS1115 + Hall sensor rail) is a standard, low-risk way to block any remaining high-frequency noise from ever reaching the analog supply. C6 gives the bead's output a local high-frequency return path right where it matters.</li>
+      <li><b>A matching ground-side ferrite (FB4): deliberately left out.</b> Splitting the ground plane with a bead is a real technique, but it's a much bigger risk on a 2-layer board, which has only one copper pour doing double duty as the return path for every signal. Any trace that ends up crossing the split forces its return current the long way around through the bead, which can make EMI and noise coupling <i>worse</i>, not better. This board gets the isolation benefit from FB3 alone, plus keeping the ADS1115/sensor front-end physically grouped away from the LM2596 and ESP32-C3 on a single, unbroken ground pour (Sheet 8 grounding notes in the companion doc). If you later move to 4 layers with a dedicated ground plane, a ground-side split becomes much safer to revisit.</li>
       <li><b>Light load, no heatsinking needed.</b> With the Pro Mini off this rail, U2 only feeds the ADS1115 (~150&#181;A) and the Hall sensor's excitation current (typically well under 50mA) &mdash; dissipation is negligible.</li>
       <li><b>Two independent 3.3V domains.</b> This rail and the Pro Mini's own internal 3.3V (from its onboard regulator, Sheet 3) are separate regulators at the same nominal voltage, not the same net &mdash; see Sheet 3 notes on why that's fine for I&sup2;C.</li>
     </ul>
@@ -424,8 +444,10 @@
         <tbody>
           <tr><td>C3</td><td>Input cap</td><td>10&#181;F ceramic, X7R</td><td>0805</td><td>At U2 VIN</td></tr>
           <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>SOT-223</td><td>&mdash;</td></tr>
-          <tr><td>C4</td><td>Output cap</td><td>22&#181;F tantalum</td><td>Case B (3216-18)</td><td>Required for LDO stability</td></tr>
+          <tr><td>C4</td><td>Output cap</td><td>22&#181;F tantalum</td><td>Case B (3216-18)</td><td>Required for LDO stability, right at U2 VOUT</td></tr>
           <tr><td>C5</td><td>Output cap</td><td>100nF ceramic</td><td>0603</td><td>Parallel with C4, close to pins</td></tr>
+          <tr><td>FB3</td><td>Ferrite bead</td><td>~100&#8486;@100MHz, e.g. BLM18-series</td><td>0603</td><td>Isolates AVDD from the shared 3.3V node, after C4/C5</td></tr>
+          <tr><td>C6</td><td>Decoupling cap</td><td>1&#181;F ceramic</td><td>0805</td><td>Local HF decoupling right after FB3, on the AVDD side</td></tr>
         </tbody>
       </table>
     </div>
@@ -437,7 +459,7 @@
   <section class="sheet" id="sheet3">
     <div class="sheet-head">
       <h2>Sheet 3 &mdash; ESP32-C3 Pro Mini</h2>
-      <span class="sheet-no">RA-1&ndash;03 &middot; Rev E</span>
+      <span class="sheet-no">RA-1&ndash;03 &middot; Rev F</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: ESP32-C3 Pro Mini board fed directly from the +5V rail, using its own onboard regulation, with only a small optional bulk capacitor added externally, and I2C SDA/SCL plus an ALERT interrupt line routed off-page to the ADS1115 sheet.">
@@ -521,7 +543,7 @@
   <section class="sheet" id="sheet4">
     <div class="sheet-head">
       <h2>Sheet 4 &mdash; ADS1115 &amp; sensor interface</h2>
-      <span class="sheet-no">RA-1&ndash;04 &middot; Rev E</span>
+      <span class="sheet-no">RA-1&ndash;04 &middot; Rev F</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1160 1140" role="img" aria-label="Schematic: ADS1115 ADC with I2C pull-ups and ADDR tied low. AIN0 reads the Hall angle sensor through an RC filter and diode clamp. AIN1 reads a 5V-biased resistive divider (510 ohm fixed resistor on-board, 0 to 190 ohm float sender remote at the tank) through the same filter and clamp. AIN2 and AIN3 are Kelvin-sense lines back to the Hall sensor's own supply and ground pins, each with matching filter and clamp networks, connected through a five-pin connector to the sensor.">
@@ -538,9 +560,9 @@
         </defs>
         <rect width="1160" height="1140" fill="url(#g4)"/>
 
-        <!-- incoming +3V3 -->
+        <!-- incoming AVDD (filtered 3.3V, through FB3 on Sheet 2) -->
         <use href="#s4-flag-l" x="70" y="60" class="offpage offpage-power"/>
-        <text class="lbl-power" x="70" y="64" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="11">+3V3</text>
+        <text class="lbl-power" x="70" y="64" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">AVDD</text>
         <text class="lbl-faint" x="70" y="34" text-anchor="middle">SHEET 2 &rarr;</text>
         <line class="wire wire-power" x1="102" y1="60" x2="1060" y2="60"/>
 
@@ -604,7 +626,7 @@
         <text class="lbl-faint" x="700" y="162" text-anchor="middle">R6 10k</text>
         <line class="wire wire-sense" x1="734" y1="185" x2="740" y2="185"/>
         <use href="#s4-flag-u-sm" x="740" y="100" class="offpage offpage-power"/>
-        <text class="lbl-power" x="740" y="80" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">+3V3</text>
+        <text class="lbl-power" x="740" y="80" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">AVDD</text>
         <line class="wire wire-power" x1="740" y1="114" x2="740" y2="125"/>
         <use href="#s4-diode-sm-catU" x="740" y="141" class="wire-power"/>
         <line class="wire" x1="740" y1="157" x2="740" y2="185"/>
@@ -626,7 +648,7 @@
         <text class="lbl-faint" x="700" y="402" text-anchor="middle">R7 10k</text>
         <line class="wire wire-sense" x1="734" y1="425" x2="740" y2="425"/>
         <use href="#s4-flag-u-sm" x="740" y="340" class="offpage offpage-power"/>
-        <text class="lbl-power" x="740" y="320" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">+3V3</text>
+        <text class="lbl-power" x="740" y="320" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">AVDD</text>
         <line class="wire wire-power" x1="740" y1="354" x2="740" y2="365"/>
         <use href="#s4-diode-sm-catU" x="740" y="381" class="wire-power"/>
         <line class="wire" x1="740" y1="397" x2="740" y2="425"/>
@@ -681,7 +703,7 @@
         <text class="lbl-faint" x="700" y="642" text-anchor="middle">R8 10k</text>
         <line class="wire wire-sense" x1="734" y1="665" x2="740" y2="665"/>
         <use href="#s4-flag-u-sm" x="740" y="580" class="offpage offpage-power"/>
-        <text class="lbl-power" x="740" y="560" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">+3V3</text>
+        <text class="lbl-power" x="740" y="560" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">AVDD</text>
         <line class="wire wire-power" x1="740" y1="594" x2="740" y2="605"/>
         <use href="#s4-diode-sm-catU" x="740" y="621" class="wire-power"/>
         <line class="wire" x1="740" y1="637" x2="740" y2="665"/>
@@ -703,7 +725,7 @@
         <text class="lbl-faint" x="700" y="882" text-anchor="middle">R9 10k</text>
         <line class="wire wire-sense" x1="734" y1="905" x2="740" y2="905"/>
         <use href="#s4-flag-u-sm" x="740" y="820" class="offpage offpage-power"/>
-        <text class="lbl-power" x="740" y="800" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">+3V3</text>
+        <text class="lbl-power" x="740" y="800" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">AVDD</text>
         <line class="wire wire-power" x1="740" y1="834" x2="740" y2="845"/>
         <use href="#s4-diode-sm-catU" x="740" y="861" class="wire-power"/>
         <line class="wire" x1="740" y1="877" x2="740" y2="905"/>
@@ -721,7 +743,7 @@
         <text class="lbl-faint" x="900" y="978" text-anchor="middle">clamp diodes conduct only outside normal</text>
         <text class="lbl-faint" x="900" y="993" text-anchor="middle">range &mdash; don't tie this line to GND otherwise</text>
 
-        <text class="lbl-faint" x="900" y="1055" text-anchor="middle">clamp diode pairs D3&ndash;D10: BAT54S dual packages (one +3V3 leg / one GND leg per channel, all four AINx)</text>
+        <text class="lbl-faint" x="900" y="1055" text-anchor="middle">clamp diode pairs D3&ndash;D10: BAT54S dual packages (one AVDD leg / one GND leg per channel, all four AINx)</text>
 
         <!-- J2 sensor connector -->
         <rect class="sym-body" x="1000" y="90" width="90" height="880"/>
@@ -739,14 +761,14 @@
           <rect x="820" y="1070" width="240" height="60"/>
           <text x="830" y="1086" class="tb-strong">RA-1 &middot; ADC + SENSOR</text>
           <text x="830" y="1102" >SHEET 4 OF 4</text>
-          <text x="830" y="1118">REV E</text>
+          <text x="830" y="1118">REV F</text>
           <text x="980" y="1102">SIZE A3</text>
           <text x="980" y="1118">SCALE NONE</text>
         </g>
         <text class="lbl-faint" x="80" y="1085">Firmware: angle_ratio = (AIN0 &minus; AIN3) &divide; (AIN2 &minus; AIN3)</text>
         <text class="lbl-faint" x="80" y="1103">&mdash; cancels regulator drift and cable IR drop using the two Kelvin-sense channels.</text>
       </svg>
-      <figcaption>All four ADC channels share one RC anti-alias filter + dual-diode clamp topology: the filter cap and the lower clamp diode are two independent branches off the signal node, both landing on GND in parallel &mdash; not chained through each other. The clamp pair (one leg to +3V3, one to GND) is a single BAT54S per channel; the filter cap is a separate part at the same node. Referenced to the ADS1115's own +3V3 rail regardless of what biases the signal; AIN1's divider itself runs off +5V, AIN2/AIN3 are true Kelvin sense lines back to the Hall sensor's own supply/ground pins.</figcaption>
+      <figcaption>All four ADC channels share one RC anti-alias filter + dual-diode clamp topology: the filter cap and the lower clamp diode are two independent branches off the signal node, both landing on GND in parallel &mdash; not chained through each other. The clamp pair (one leg to AVDD, one to GND) is a single BAT54S per channel; the filter cap is a separate part at the same node. Referenced to the ADS1115's own AVDD rail (the ferrite-filtered 3.3V from Sheet 2) regardless of what biases the signal; AIN1's divider itself runs off +5V, AIN2/AIN3 are true Kelvin sense lines back to the Hall sensor's own supply/ground pins.</figcaption>
     </figure>
 
     <ul class="notes">
@@ -784,7 +806,7 @@
   <section class="sheet" id="bom">
     <div class="sheet-head">
       <h2>Full bill of materials</h2>
-      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev E</span>
+      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev F</span>
     </div>
     <div class="tblwrap">
       <table>
@@ -804,6 +826,8 @@
           <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>SOT-223</td><td>2</td></tr>
           <tr><td>C4</td><td>Output cap</td><td>22&#181;F tantalum</td><td>Case B (3216-18)</td><td>2</td></tr>
           <tr><td>C5</td><td>Output cap</td><td>100nF ceramic</td><td>0603</td><td>2</td></tr>
+          <tr><td>FB3</td><td>Ferrite bead</td><td>~100&#8486;@100MHz, e.g. BLM18-series</td><td>0603</td><td>2</td></tr>
+          <tr><td>C6</td><td>Decoupling cap</td><td>1&#181;F ceramic</td><td>0805</td><td>2</td></tr>
           <tr><td>U3</td><td>MCU board</td><td>ESP32-C3 Pro Mini</td><td>Module (header/castellated mount)</td><td>3</td></tr>
           <tr><td>C7</td><td>Bulk cap</td><td>47&ndash;100&#181;F (optional)</td><td>SMD radial can, &oslash;6.3&times;5.4 to &oslash;8&times;10.5mm</td><td>3</td></tr>
           <tr><td>U4</td><td>16-bit ADC</td><td>ADS1115</td><td>VSSOP-10 (3&times;3mm)</td><td>4</td></tr>
@@ -834,5 +858,5 @@
 </div>
 
 <footer>
-  RA-1 Rudder Angle Indicator &middot; Rev E &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
+  RA-1 Rudder Angle Indicator &middot; Rev F &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
 </footer>
