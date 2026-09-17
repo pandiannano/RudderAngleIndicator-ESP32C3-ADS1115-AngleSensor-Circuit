@@ -109,10 +109,11 @@
   <p class="lede">ESP32-C3 Pro Mini + ADS1115, powered from a 12&ndash;24V DC bus of unknown polarity through a bridge-rectifier input stage and an LM2596 buck. Two independent regulated rails: +5V runs the Pro Mini (self-regulating) and biases the float-sensor divider; +3.3V (AMS1117) is dedicated to the ADC and the Hall sensor's ratiometric supply.</p>
   <div class="doc-meta">
     <span><b>Project</b> RA-1 Rudder Angle Indicator</span>
-    <span><b>Rev</b> D</span>
+    <span><b>Rev</b> E</span>
     <span><b>Sheets</b> 1&ndash;4 of 4</span>
     <span><b>MCU</b> ESP32-C3 Pro Mini</span>
     <span><b>ADC</b> ADS1115</span>
+    <span><b>Build</b> SMD, 2-layer PCB</span>
   </div>
 </header>
 
@@ -153,7 +154,7 @@
   <section class="sheet" id="sheet1">
     <div class="sheet-head">
       <h2>Sheet 1 &mdash; Power input &amp; LM2596 buck (12/24V &rarr; 5V)</h2>
-      <span class="sheet-no">RA-1&ndash;01 &middot; Rev D</span>
+      <span class="sheet-no">RA-1&ndash;01 &middot; Rev E</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1300 480" role="img" aria-label="Schematic: two-pin DC input of unknown polarity feeding a fuse and a full bridge rectifier wired across both input legs, so the rectifier's output is always correct polarity regardless of how the input is wired. A unidirectional TVS diode and bulk capacitor follow the rectifier, then an LM2596 buck regulator producing a regulated +5V rail with an output inductor, catch diode, output filter capacitors, and a feedback jumper wired to the true regulated output.">
@@ -302,7 +303,7 @@
           <rect x="920" y="404" width="300" height="66"/>
           <text x="930" y="420" class="tb-strong">RA-1 &middot; POWER INPUT</text>
           <text x="930" y="436">SHEET 1 OF 4</text>
-          <text x="930" y="452">REV D</text>
+          <text x="930" y="452">REV E</text>
           <text x="1120" y="436">SIZE A4</text>
           <text x="1120" y="452">SCALE NONE</text>
         </g>
@@ -323,17 +324,17 @@
     <div class="tblwrap">
       <table>
         <caption>Sheet 1 &mdash; bill of materials</caption>
-        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Package</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>J1</td><td>DC input connector</td><td>2-pin, 5.08mm terminal block</td><td>Rated &ge;3A, either polarity</td></tr>
-          <tr><td>F1</td><td>Fuse</td><td>1A fast-blow (or PTC resettable)</td><td>In series with leg A, ahead of BR1</td></tr>
-          <tr><td>BR1</td><td>Bridge rectifier</td><td>W10 (1.5A / 1000V DIP)</td><td>DC in on AC terminals &mdash; polarity-agnostic</td></tr>
-          <tr><td>D1</td><td>TVS diode</td><td>SMBJ33A (24V) / SMBJ18A (12V)</td><td>Unidirectional, after BR1</td></tr>
-          <tr><td>C1</td><td>Electrolytic cap</td><td>220&#181;F / 50V</td><td>Input bulk</td></tr>
-          <tr><td>U1</td><td>Buck regulator</td><td>LM2596-5.0</td><td>Fixed 5V output</td></tr>
-          <tr><td>L1</td><td>Power inductor</td><td>33&ndash;68&#181;H, shielded</td><td>Per LM2596 selection chart</td></tr>
-          <tr><td>D2</td><td>Schottky diode</td><td>1N5822 (3A/40V)</td><td>Buck catch diode</td></tr>
-          <tr><td>C2 / C2b</td><td>Output caps</td><td>220&#181;F/25V + 100nF ceramic</td><td>Low-ESR electrolytic</td></tr>
+          <tr><td>J1</td><td>DC input connector</td><td>2-pin, 5.08mm terminal block</td><td>THT, 5.08mm pluggable screw terminal</td><td>Rated &ge;3A, either polarity</td></tr>
+          <tr><td>F1</td><td>Fuse</td><td>1A fast-blow (or PTC resettable)</td><td>1206 SMD fuse (1210 if PTC)</td><td>In series with leg A, ahead of BR1</td></tr>
+          <tr><td>BR1</td><td>Bridge rectifier</td><td>W10 function / DF10S (SMD equiv.)</td><td>SMD SOP-4-style, ~5&times;5mm</td><td>W10 itself is THT DIP-4 &mdash; substitute the SMD-package equivalent for this build</td></tr>
+          <tr><td>D1</td><td>TVS diode</td><td>SMBJ33A (24V) / SMBJ18A (12V)</td><td>SMB (DO-214AA)</td><td>Unidirectional, after BR1</td></tr>
+          <tr><td>C1</td><td>Electrolytic cap</td><td>220&#181;F / 50V</td><td>SMD radial can, &oslash;10&times;10.5mm (verify per vendor)</td><td>Input bulk</td></tr>
+          <tr><td>U1</td><td>Buck regulator</td><td>LM2596-5.0</td><td>TO-263-5 (D2PAK-5), SMD</td><td>Fixed 5V output</td></tr>
+          <tr><td>L1</td><td>Power inductor</td><td>33&ndash;68&#181;H, shielded</td><td>SMD shielded power inductor, ~10&times;10mm (e.g. 1050 case)</td><td>Per LM2596 selection chart</td></tr>
+          <tr><td>D2</td><td>Schottky diode</td><td>1N5822 function / SS54 (SMD equiv.)</td><td>SMB (DO-214AA)</td><td>1N5822 itself is THT &mdash; substitute the SMD equivalent</td></tr>
+          <tr><td>C2 / C2b</td><td>Output caps</td><td>220&#181;F/25V + 100nF ceramic</td><td>SMD radial can &oslash;8&times;10.5mm (C2) + 0805 (C2b)</td><td>Low-ESR electrolytic</td></tr>
         </tbody>
       </table>
     </div>
@@ -345,7 +346,7 @@
   <section class="sheet" id="sheet2">
     <div class="sheet-head">
       <h2>Sheet 2 &mdash; AMS1117-3.3 LDO &amp; rail distribution (5V &rarr; 3.3V)</h2>
-      <span class="sheet-no">RA-1&ndash;02 &middot; Rev D</span>
+      <span class="sheet-no">RA-1&ndash;02 &middot; Rev E</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: 5V rail from Sheet 1 feeding an AMS1117-3.3 linear regulator with input and output decoupling capacitors, producing a clean 3.3V rail dedicated to the ADC domain, fanning out only to the ADS1115 VDD and the Hall sensor supply on Sheet 4 — the ESP32-C3 Pro Mini is not on this rail.">
@@ -419,11 +420,12 @@
     <div class="tblwrap">
       <table>
         <caption>Sheet 2 &mdash; bill of materials</caption>
-        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Package</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>C3</td><td>Input cap</td><td>10&#181;F tantalum/ceramic</td><td>At U2 VIN</td></tr>
-          <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>SOT-223</td></tr>
-          <tr><td>C4 / C5</td><td>Output caps</td><td>22&#181;F tantalum + 100nF ceramic</td><td>Required for LDO stability</td></tr>
+          <tr><td>C3</td><td>Input cap</td><td>10&#181;F ceramic, X7R</td><td>0805</td><td>At U2 VIN</td></tr>
+          <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>SOT-223</td><td>&mdash;</td></tr>
+          <tr><td>C4</td><td>Output cap</td><td>22&#181;F tantalum</td><td>Case B (3216-18)</td><td>Required for LDO stability</td></tr>
+          <tr><td>C5</td><td>Output cap</td><td>100nF ceramic</td><td>0603</td><td>Parallel with C4, close to pins</td></tr>
         </tbody>
       </table>
     </div>
@@ -435,7 +437,7 @@
   <section class="sheet" id="sheet3">
     <div class="sheet-head">
       <h2>Sheet 3 &mdash; ESP32-C3 Pro Mini</h2>
-      <span class="sheet-no">RA-1&ndash;03 &middot; Rev D</span>
+      <span class="sheet-no">RA-1&ndash;03 &middot; Rev E</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: ESP32-C3 Pro Mini board fed directly from the +5V rail, using its own onboard regulation, with only a small optional bulk capacitor added externally, and I2C SDA/SCL plus an ALERT interrupt line routed off-page to the ADS1115 sheet.">
@@ -504,10 +506,10 @@
     <div class="tblwrap">
       <table>
         <caption>Sheet 3 &mdash; bill of materials</caption>
-        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Package</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>U3</td><td>MCU board</td><td>ESP32-C3 Pro Mini</td><td>Self-regulating, 5V in</td></tr>
-          <tr><td>C7</td><td>Bulk cap</td><td>47&ndash;100&#181;F</td><td>Optional, at 5V input for extra margin</td></tr>
+          <tr><td>U3</td><td>MCU board</td><td>ESP32-C3 Pro Mini</td><td>Module &mdash; mounts via pin headers/castellated edge, not a discrete package; confirm footprint against your specific board variant</td><td>Self-regulating, 5V in</td></tr>
+          <tr><td>C7</td><td>Bulk cap</td><td>47&ndash;100&#181;F</td><td>SMD radial can &oslash;6.3&times;5.4mm (47&#181;F) to &oslash;8&times;10.5mm (100&#181;F)</td><td>Optional, at 5V input for extra margin</td></tr>
         </tbody>
       </table>
     </div>
@@ -519,7 +521,7 @@
   <section class="sheet" id="sheet4">
     <div class="sheet-head">
       <h2>Sheet 4 &mdash; ADS1115 &amp; sensor interface</h2>
-      <span class="sheet-no">RA-1&ndash;04 &middot; Rev D</span>
+      <span class="sheet-no">RA-1&ndash;04 &middot; Rev E</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1160 1140" role="img" aria-label="Schematic: ADS1115 ADC with I2C pull-ups and ADDR tied low. AIN0 reads the Hall angle sensor through an RC filter and diode clamp. AIN1 reads a 5V-biased resistive divider (510 ohm fixed resistor on-board, 0 to 190 ohm float sender remote at the tank) through the same filter and clamp. AIN2 and AIN3 are Kelvin-sense lines back to the Hall sensor's own supply and ground pins, each with matching filter and clamp networks, connected through a five-pin connector to the sensor.">
@@ -737,7 +739,7 @@
           <rect x="820" y="1070" width="240" height="60"/>
           <text x="830" y="1086" class="tb-strong">RA-1 &middot; ADC + SENSOR</text>
           <text x="830" y="1102" >SHEET 4 OF 4</text>
-          <text x="830" y="1118">REV D</text>
+          <text x="830" y="1118">REV E</text>
           <text x="980" y="1102">SIZE A3</text>
           <text x="980" y="1118">SCALE NONE</text>
         </g>
@@ -759,18 +761,18 @@
     <div class="tblwrap">
       <table>
         <caption>Sheet 4 &mdash; bill of materials</caption>
-        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Package</th><th>Notes</th></tr></thead>
         <tbody>
-          <tr><td>U4</td><td>16-bit ADC</td><td>ADS1115</td><td>I&sup2;C, 4 single-ended channels</td></tr>
-          <tr><td>R4 / R5</td><td>I&sup2;C pull-ups</td><td>4.7k&#8486;</td><td>Omit if breakout already has them</td></tr>
-          <tr><td>C10</td><td>Decoupling cap</td><td>0.1&#181;F</td><td>At U4 VDD</td></tr>
-          <tr><td>R6&ndash;R9</td><td>Series filter resistors</td><td>10k&#8486; &times;4</td><td>One per AINx</td></tr>
-          <tr><td>C11&ndash;C14</td><td>Filter caps</td><td>1&#181;F &times;4</td><td>~16Hz anti-alias, one per AINx</td></tr>
-          <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4 packages</td><td>ESD/transient protection, one per AINx</td></tr>
-          <tr><td>R1</td><td>Divider bias resistor</td><td>510&#8486;</td><td>+5V to AIN1 divider node</td></tr>
-          <tr><td>R2</td><td>Float sender (not a board part)</td><td>0&ndash;190&#8486; variable</td><td>Remote, at the tank</td></tr>
-          <tr><td>J2</td><td>Hall sensor connector</td><td>5-pin</td><td>Supply, Sig, +Sense, GND, &minus;Sense</td></tr>
-          <tr><td>J3</td><td>Float sender connector</td><td>2-pin</td><td>Sig, GND, to remote R2</td></tr>
+          <tr><td>U4</td><td>16-bit ADC</td><td>ADS1115</td><td>VSSOP-10 (MSOP-10), 3&times;3mm</td><td>I&sup2;C, 4 single-ended channels</td></tr>
+          <tr><td>R4 / R5</td><td>I&sup2;C pull-ups</td><td>4.7k&#8486;</td><td>0805</td><td>Omit if breakout already has them</td></tr>
+          <tr><td>C10</td><td>Decoupling cap</td><td>0.1&#181;F</td><td>0603</td><td>At U4 VDD</td></tr>
+          <tr><td>R6&ndash;R9</td><td>Series filter resistors</td><td>10k&#8486; &times;4</td><td>0805</td><td>One per AINx</td></tr>
+          <tr><td>C11&ndash;C14</td><td>Filter caps</td><td>1&#181;F &times;4</td><td>0805, X7R</td><td>~16Hz anti-alias, one per AINx</td></tr>
+          <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4 packages</td><td>SOT-23</td><td>ESD/transient protection, one per AINx</td></tr>
+          <tr><td>R1</td><td>Divider bias resistor</td><td>510&#8486;</td><td>0805</td><td>+5V to AIN1 divider node</td></tr>
+          <tr><td>R2</td><td>Float sender (not a board part)</td><td>0&ndash;190&#8486; variable</td><td>N/A &mdash; remote panel-mount part, not on the PCB</td><td>Remote, at the tank</td></tr>
+          <tr><td>J2</td><td>Hall sensor connector</td><td>5-pin</td><td>THT, 2.5mm-pitch locking header (e.g. JST-XH 5-pos)</td><td>Supply, Sig, +Sense, GND, &minus;Sense</td></tr>
+          <tr><td>J3</td><td>Float sender connector</td><td>2-pin</td><td>THT, 2.5mm-pitch locking header (e.g. JST-XH 2-pos)</td><td>Sig, GND, to remote R2</td></tr>
         </tbody>
       </table>
     </div>
@@ -782,39 +784,47 @@
   <section class="sheet" id="bom">
     <div class="sheet-head">
       <h2>Full bill of materials</h2>
-      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev D</span>
+      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev E</span>
     </div>
     <div class="tblwrap">
       <table>
-        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Sheet</th></tr></thead>
+        <thead><tr><th>Ref</th><th>Description</th><th>Value / part</th><th>Package</th><th>Sheet</th></tr></thead>
         <tbody>
-          <tr><td>J1</td><td>DC input connector</td><td>2-pin terminal block</td><td>1</td></tr>
-          <tr><td>F1</td><td>Fuse</td><td>1A fast-blow</td><td>1</td></tr>
-          <tr><td>BR1</td><td>Bridge rectifier</td><td>W10 (1.5A/1000V)</td><td>1</td></tr>
-          <tr><td>D1</td><td>TVS diode</td><td>SMBJ33A / SMBJ18A</td><td>1</td></tr>
-          <tr><td>C1</td><td>Electrolytic cap</td><td>220&#181;F/50V</td><td>1</td></tr>
-          <tr><td>U1</td><td>Buck regulator</td><td>LM2596-5.0</td><td>1</td></tr>
-          <tr><td>L1</td><td>Power inductor</td><td>33&ndash;68&#181;H</td><td>1</td></tr>
-          <tr><td>D2</td><td>Schottky diode</td><td>1N5822</td><td>1</td></tr>
-          <tr><td>C2/C2b</td><td>Output caps</td><td>220&#181;F + 100nF</td><td>1</td></tr>
-          <tr><td>C3</td><td>Input cap</td><td>10&#181;F</td><td>2</td></tr>
-          <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>2</td></tr>
-          <tr><td>C4/C5</td><td>Output caps</td><td>22&#181;F + 100nF</td><td>2</td></tr>
-          <tr><td>U3</td><td>MCU board</td><td>ESP32-C3 Pro Mini</td><td>3</td></tr>
-          <tr><td>C7</td><td>Bulk cap</td><td>47&ndash;100&#181;F (optional)</td><td>3</td></tr>
-          <tr><td>U4</td><td>16-bit ADC</td><td>ADS1115</td><td>4</td></tr>
-          <tr><td>R4/R5</td><td>I&sup2;C pull-ups</td><td>4.7k&#8486; &times;2</td><td>4</td></tr>
-          <tr><td>R6&ndash;R9</td><td>Filter resistors</td><td>10k&#8486; &times;4</td><td>4</td></tr>
-          <tr><td>C10</td><td>Decoupling cap</td><td>0.1&#181;F</td><td>4</td></tr>
-          <tr><td>C11&ndash;C14</td><td>Filter caps</td><td>1&#181;F &times;4</td><td>4</td></tr>
-          <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4</td><td>4</td></tr>
-          <tr><td>R1</td><td>Divider bias resistor</td><td>510&#8486;</td><td>4</td></tr>
-          <tr><td>R2</td><td>Float sender (remote)</td><td>0&ndash;190&#8486; variable</td><td>4</td></tr>
-          <tr><td>J2</td><td>Hall sensor connector</td><td>5-pin</td><td>4</td></tr>
-          <tr><td>J3</td><td>Float sender connector</td><td>2-pin</td><td>4</td></tr>
+          <tr><td>J1</td><td>DC input connector</td><td>2-pin terminal block</td><td>THT, 5.08mm pluggable</td><td>1</td></tr>
+          <tr><td>F1</td><td>Fuse</td><td>1A fast-blow</td><td>1206 SMD</td><td>1</td></tr>
+          <tr><td>BR1</td><td>Bridge rectifier</td><td>W10 function / DF10S (SMD)</td><td>SOP-4-style, ~5&times;5mm</td><td>1</td></tr>
+          <tr><td>D1</td><td>TVS diode</td><td>SMBJ33A / SMBJ18A</td><td>SMB (DO-214AA)</td><td>1</td></tr>
+          <tr><td>C1</td><td>Electrolytic cap</td><td>220&#181;F/50V</td><td>SMD radial can, &oslash;10&times;10.5mm</td><td>1</td></tr>
+          <tr><td>U1</td><td>Buck regulator</td><td>LM2596-5.0</td><td>TO-263-5 (D2PAK-5)</td><td>1</td></tr>
+          <tr><td>L1</td><td>Power inductor</td><td>33&ndash;68&#181;H</td><td>SMD shielded, ~10&times;10mm</td><td>1</td></tr>
+          <tr><td>D2</td><td>Schottky diode</td><td>1N5822 function / SS54 (SMD)</td><td>SMB (DO-214AA)</td><td>1</td></tr>
+          <tr><td>C2</td><td>Output cap</td><td>220&#181;F/25V</td><td>SMD radial can, &oslash;8&times;10.5mm</td><td>1</td></tr>
+          <tr><td>C2b</td><td>Output cap</td><td>100nF ceramic</td><td>0805</td><td>1</td></tr>
+          <tr><td>C3</td><td>Input cap</td><td>10&#181;F ceramic</td><td>0805</td><td>2</td></tr>
+          <tr><td>U2</td><td>LDO regulator</td><td>AMS1117-3.3</td><td>SOT-223</td><td>2</td></tr>
+          <tr><td>C4</td><td>Output cap</td><td>22&#181;F tantalum</td><td>Case B (3216-18)</td><td>2</td></tr>
+          <tr><td>C5</td><td>Output cap</td><td>100nF ceramic</td><td>0603</td><td>2</td></tr>
+          <tr><td>U3</td><td>MCU board</td><td>ESP32-C3 Pro Mini</td><td>Module (header/castellated mount)</td><td>3</td></tr>
+          <tr><td>C7</td><td>Bulk cap</td><td>47&ndash;100&#181;F (optional)</td><td>SMD radial can, &oslash;6.3&times;5.4 to &oslash;8&times;10.5mm</td><td>3</td></tr>
+          <tr><td>U4</td><td>16-bit ADC</td><td>ADS1115</td><td>VSSOP-10 (3&times;3mm)</td><td>4</td></tr>
+          <tr><td>R4/R5</td><td>I&sup2;C pull-ups</td><td>4.7k&#8486; &times;2</td><td>0805</td><td>4</td></tr>
+          <tr><td>R6&ndash;R9</td><td>Filter resistors</td><td>10k&#8486; &times;4</td><td>0805</td><td>4</td></tr>
+          <tr><td>C10</td><td>Decoupling cap</td><td>0.1&#181;F</td><td>0603</td><td>4</td></tr>
+          <tr><td>C11&ndash;C14</td><td>Filter caps</td><td>1&#181;F &times;4</td><td>0805</td><td>4</td></tr>
+          <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4</td><td>SOT-23</td><td>4</td></tr>
+          <tr><td>R1</td><td>Divider bias resistor</td><td>510&#8486;</td><td>0805</td><td>4</td></tr>
+          <tr><td>R2</td><td>Float sender (remote)</td><td>0&ndash;190&#8486; variable</td><td>N/A &mdash; off-board</td><td>4</td></tr>
+          <tr><td>J2</td><td>Hall sensor connector</td><td>5-pin</td><td>THT, 2.5mm locking (JST-XH 5-pos)</td><td>4</td></tr>
+          <tr><td>J3</td><td>Float sender connector</td><td>2-pin</td><td>THT, 2.5mm locking (JST-XH 2-pos)</td><td>4</td></tr>
         </tbody>
       </table>
     </div>
+
+    <div class="callout">
+      <b>Default passive size: 0805.</b> Resistors and small ceramic caps default to 0805 throughout &mdash; hand-solder-friendly on a 2-layer board while still keeping things compact. Drop to 0603 across the board if you want a tighter layout and you're reflow-soldering (oven or hot-air), not hand-soldering with an iron.
+    </div>
+    <div class="callout">
+      <b>Two parts substituted for SMD.</b> BR1 (bridge rectifier) and D2 (catch diode) were specified by their classic THT part numbers (W10, 1N5822) earlier in this design purely by function/rating &mdash; for this SMD build, use their SMD-package equivalents (DF10S-class bridge, SS54 Schottky) called out in the Package column above. Everything else was already SMD-native.</div>
 
     <div class="callout">
       <b>Before you lay this out:</b> confirm exact pin numbering for U1, U2, U3, U4 against the datasheet for the specific package/module you buy &mdash; this drawing set fixes pin <i>function</i> and net topology, which is what the electrical design depends on; physical pin numbers are a footprint detail you'll cross-reference during PCB layout.
@@ -824,5 +834,5 @@
 </div>
 
 <footer>
-  RA-1 Rudder Angle Indicator &middot; Rev D &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
+  RA-1 Rudder Angle Indicator &middot; Rev E &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
 </footer>

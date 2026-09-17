@@ -4,6 +4,8 @@ ESP32-C3 Pro Mini + ADS1115 + Hall-effect rudder angle sensor + resistive float 
 
 **Revision note:** this revision splits the power architecture into two independent rails: **+5V runs the ESP32-C3 Pro Mini (which regulates itself internally) and biases the float sensor divider; +3.3V (from the AMS1117) is dedicated to the ADS1115 and the Hall sensor's ratiometric supply.** The two 3.3V-ish domains (the Pro Mini's own internal regulation and the external AMS1117 rail) are separate regulators tied only by common ground — see §7.
 
+**Build target: SMD, 2-layer PCB.** Every table below carries an SMD package alongside the value. Default passive size is **0805** (hand-solder-friendly while staying compact) — drop to 0603 across the board if you're reflow-soldering and want a tighter layout. Connectors (J1–J3) stay through-hole, as is normal practice even on an otherwise-SMD board, since screw/locking terminals need the mechanical strength. Two parts — the bridge rectifier and the buck's catch diode — were specified earlier by their classic through-hole part numbers (W10, 1N5822); this doc calls out their SMD-package equivalents (DF10S-class, SS54) wherever they appear. The [schematic drawing set](schematic-artifact.html) carries the complete, per-sheet BOM with every package spelled out — treat it as the source of truth for layout.
+
 ## 1. Block diagram
 
 ```mermaid
@@ -59,12 +61,14 @@ flowchart TB
 
 Boat 12V/24V rails are electrically dirty: alternator load-dump transients, other loads switching on/off, and occasional reverse-connection mistakes. This revision protects reverse polarity with a **full bridge rectifier (BR1)** wired across both input legs, rather than a series MOSFET.
 
-| Component | Purpose | Suggested part / value |
-|---|---|---|
-| Fuse / PTC resettable fuse | Over-current / short protection | 1 A fast-blow, or 0.5–1 A PTC, in series with one input leg |
-| Bridge rectifier (BR1) | Polarity-agnostic input — output is always correct polarity | W10 (1.5A / 1000V DIP) |
-| TVS diode (unidirectional) | Clamp load-dump / switching transients | SMBJ33A (24V systems) or SMBJ18A (12V systems), after BR1 |
-| Input bulk capacitor | Absorb ripple, supply buck's pulsed current | 100–220 µF electrolytic, ≥50V rating |
+| Component | Purpose | Suggested part / value | SMD package |
+|---|---|---|---|
+| Fuse / PTC resettable fuse | Over-current / short protection | 1 A fast-blow, or 0.5–1 A PTC, in series with one input leg | 1206 (1210 for PTC) |
+| Bridge rectifier (BR1) | Polarity-agnostic input — output is always correct polarity | W10 function / **DF10S** (SMD equivalent) | SOP-4-style, ~5×5mm |
+| TVS diode (unidirectional) | Clamp load-dump / switching transients | SMBJ33A (24V systems) or SMBJ18A (12V systems), after BR1 | SMB (DO-214AA) |
+| Input bulk capacitor | Absorb ripple, supply buck's pulsed current | 100–220 µF electrolytic, ≥50V rating | SMD radial can, ⌀10×10.5mm |
+
+Note: **W10 itself is a through-hole DIP-4 package** — for this SMD build, substitute its SMD-package equivalent (a "DF10S"-class part, same 1.5A/1000V rating, in a small SOP-4-style surface-mount body). Same story for the LM2596's catch diode below (1N5822 → SS54).
 
 **Why a bridge instead of a MOSFET.** Feeding an unknown-polarity DC source into a bridge rectifier's two AC terminals is a standard trick: whichever leg is actually positive, two of the four diodes conduct and the DC output on the +/− terminals is always correct polarity. Compared to the earlier series P-MOSFET approach:
 
@@ -79,13 +83,14 @@ Boat 12V/24V rails are electrically dirty: alternator load-dump transients, othe
 
 Use the fixed **LM2596-5.0** (simpler, no feedback divider) rather than the adjustable version, since only one intermediate voltage is needed.
 
-| Component | Value / notes |
-|---|---|
-| Input cap | 100 µF / 50V, low-ESR, close to Vin pin |
-| Inductor | 33–68 µH (per LM2596 datasheet selection chart for Vin=12–24V, Vout=5V, ~1A load); use a shielded type to limit radiated EMI |
-| Catch diode | Schottky, e.g. 1N5822 (3A/40V) |
-| Output cap | 220 µF low-ESR electrolytic + 100 nF ceramic in parallel |
-| Feedback (if using adjustable variant) | R1=1kΩ, R2 per datasheet formula for 5V, 1% tolerance |
+| Component | Value / notes | SMD package |
+|---|---|---|
+| U1 (regulator) | LM2596-5.0, fixed 5V | **TO-263-5 (D2PAK-5)** — the SMD version of the TO-220-5 |
+| Input cap | 100 µF / 50V, low-ESR, close to Vin pin | SMD radial can, ⌀8–10×10.5mm |
+| Inductor | 33–68 µH (per LM2596 datasheet selection chart for Vin=12–24V, Vout=5V, ~1A load); use a shielded type to limit radiated EMI | SMD shielded power inductor, ~10×10mm (e.g. 1050 case) |
+| Catch diode | Schottky function, 1N5822 (3A/40V) / **SS54** (SMD equivalent) | SMB (DO-214AA) |
+| Output cap | 220 µF low-ESR electrolytic + 100 nF ceramic in parallel | SMD radial can ⌀8×10.5mm + 0805 |
+| Feedback (if using adjustable variant) | R1=1kΩ, R2 per datasheet formula for 5V, 1% tolerance | 0805 |
 
 This 5V rail now has three loads: the AMS1117-3.3 (for the ADC domain), the ESP32-C3 Pro Mini's own onboard regulator, and the top of the float-sensor divider (§6a). Don't feed 24V directly into the AMS1117 — the drop across a linear regulator from 24V→3.3V would dissipate ~20V × Iload as heat, which is impractical; the buck stage must absorb the bulk of the drop first.
 
@@ -97,15 +102,17 @@ Cascading buck→LDO is deliberate, not redundant: the LM2596's switching ripple
 
 This 3.3V rail is now dedicated to the ADC side of the board — it powers **only** the ADS1115 and the Hall sensor's supply (which sets the sensor's 0–3.3V ratiometric range). The ESP32-C3 Pro Mini does **not** draw from this rail; it regulates its own 3.3V internally from the 5V rail (§7). This keeps the ADC's supply light, quiet, and isolated from the MCU's Wi-Fi current transients.
 
-| Component | Value / notes |
-|---|---|
-| Input cap | 10 µF tantalum/ceramic on the 5V side |
-| Output cap | 22 µF tantalum (or 10 µF ceramic, X5R/X7R) + 100 nF ceramic close to pins — required for LDO stability |
+| Component | Value / notes | SMD package |
+|---|---|---|
+| U2 (regulator) | AMS1117-3.3 | **SOT-223** |
+| Input cap | 10 µF ceramic (X7R) on the 5V side | 0805 |
+| Output cap | 22 µF tantalum + 100 nF ceramic close to pins — required for LDO stability | Case B tantalum (3216-18) + 0603 |
 
 Thermal check: at this rail's much lighter load now (ADS1115 ~150 µA + Hall sensor excitation current, typically well under 50 mA total), the AMS1117 runs cool — no heatsinking concerns.
 
 ## 5. ADS1115 wiring
 
+- U4: **VSSOP-10** (also marked MSOP-10), 3×3mm — the ADS1115's standard SMD package.
 - VDD from the dedicated 3.3V rail (AMS1117 output, ADC domain).
 - I2C: SDA/SCL to ESP32-C3 Pro Mini GPIOs, 4.7kΩ pull-ups to the ADS1115's 3.3V rail (only one set on the bus — most ADS1115 breakout boards already include them). See §7 for why pull-ups reference this rail specifically, given the Pro Mini has its own separate 3.3V.
 - ADDR pin tied to GND for default address 0x48.
@@ -129,12 +136,16 @@ AINx ---[ R 4.7k-10k ]---+--- to ADS1115 pin
 
 Pick R/C for cutoff well below the ADS1115 conversion rate but well above the sensor's real bandwidth (a rudder moves slowly): e.g. R=10kΩ, C=1µF gives ~16 Hz cutoff — plenty of noise rejection with no meaningful lag.
 
+**Default SMD sizes for this section:** series R and filter C → **0805**; BAT54S clamp pairs → **SOT-23**. Drop to 0603 across the board if you're reflow- rather than hand-soldering and want a tighter layout. The filter cap and the clamp-to-GND diode are two independent branches off the signal node landing on GND in parallel — not chained through each other (see Sheet 4 of the schematic for the corrected topology).
+
 - **AIN0 – Rudder angle**: Hall sensor signal output, ratiometric 0–3.3V, supplied from the AMS1117 3.3V rail.
 - **AIN1 – Float sensor**: see §6a — a resistive divider output, 0–1.4V, biased from the **5V** rail (not 3.3V).
 - **AIN2 – Sensor supply sense**: a dedicated wire back from the Hall sensor's actual supply pin (Kelvin sense), *not* just tapped at the regulator. This is what lets you detect cable IR drop or connector resistance.
 - **AIN3 – Sensor ground sense**: a dedicated wire back from the Hall sensor's actual ground pin, referenced to the ADS1115's own GND. Any non-zero reading here is the IR drop / offset in the return conductor.
 
 This requires a 5-conductor cable to the Hall sensor (supply, ground, signal, +sense, −sense) rather than 3, if you want the sense readings to reflect what's happening at the sensor itself rather than just at the electronics enclosure. If a 5-wire run isn't practical, AIN2/AIN3 can instead just monitor the local 3.3V rail and local ground at the enclosure — still useful for catching regulator drift, but it won't correct for voltage dropped along the cable.
+
+J2 (the 5-pin Hall sensor connector): a **2.5mm-pitch locking header, through-hole** (e.g. JST-XH 5-position) — a bare pin header or terminal block isn't a great choice here given this cable runs through a moving/vibrating part of the boat.
 
 **Firmware implication (drives why 4 single-ended channels is the right hardware choice):** since all four channels share one ADS1115 GND, compute the sensor's true ratiometric position as:
 
@@ -159,6 +170,8 @@ The float sender is a variable resistor, 0–190Ω across its travel (standard E
 - At R2 = 0Ω (empty/full end of travel): Vout = 0V.
 - At R2 = 190Ω (opposite end of travel): Vout = 5V × 190/(510+190) ≈ **1.36V**.
 
+R1 (510Ω, on-board): **0805**. R2 (the sender itself) isn't a PCB part — it's a remote, panel-mounted variable resistor at the tank, wired in via J3 (a 2.5mm-pitch locking header, e.g. JST-XH, through-hole).
+
 That ~1.4V max lands comfortably inside the ADS1115's absolute input range even though the ADC itself runs on the separate 3.3V rail (max allowed input ≈ VDD + 0.3V ≈ 3.6V) — there's no scaling hazard here.
 
 **Do you need an op-amp?** No. The divider's Thevenin source impedance tops out around R1∥R2 ≈ 138Ω (at R2 = 190Ω) — trivially low next to the ADS1115's recommended source impedance, and the anti-alias resistor you're already adding (R 4.7–10kΩ) dominates the total source impedance anyway. A unity-gain op-amp buffer would add a component, a supply rail for the op-amp itself, and another failure point without fixing anything real here.
@@ -171,8 +184,9 @@ The only case where a buffer earns its keep: if the float sender cable run is lo
 
 The Pro Mini form-factor board carries its own onboard regulator, so it's wired far more simply than a bare module:
 
+- U3 is a **module**, not a discrete package — it mounts via pin headers or a castellated edge depending on the specific board variant; confirm the exact footprint against your board's own datasheet rather than assuming a generic size.
 - Feed the board's **5V/VIN pin directly from the LM2596's 5V rail** — do not route the AMS1117's 3.3V to it. Its onboard regulator handles 5V→3.3V internally for the chip.
-- A modest bulk cap (47–100 µF) at the Pro Mini's 5V input is cheap insurance against wiring inductance and the board's own Wi-Fi TX current transients, even though it has on-board decoupling already.
+- A modest bulk cap (47–100 µF, SMD radial can ⌀6.3×5.4 to ⌀8×10.5mm) at the Pro Mini's 5V input is cheap insurance against wiring inductance and the board's own Wi-Fi TX current transients, even though it has on-board decoupling already.
 - Its 3V3 pin (if broken out) is that onboard regulator's *output* — usable for a small extra peripheral if needed, but not a substitute for the dedicated AMS1117 rail powering the ADS1115.
 
 **Two independent 3.3V domains.** The Pro Mini's internal 3.3V (from its own onboard LDO) and the AMS1117's 3.3V (feeding the ADS1115) are two separately regulated rails that happen to be the same nominal voltage — they are **not** the same net, and should not be tied together. What ties the two boards together electrically is a common **GND** (star-grounded, §8) and the I2C bus. Reference the I2C pull-ups (4.7kΩ) to the **ADS1115's** 3.3V rail, not the Pro Mini's — the Pro Mini's GPIOs read/drive against its own internal ~3.3V logic levels, which are close enough to the ADS1115's independently-regulated 3.3V for standard I2C to work correctly across the two domains, as long as ground is common.
