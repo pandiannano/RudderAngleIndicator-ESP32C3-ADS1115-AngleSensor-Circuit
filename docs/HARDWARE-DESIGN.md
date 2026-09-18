@@ -25,15 +25,16 @@ flowchart TB
     R5V --> AMS["AMS1117-3.3 LDO\n5V -> 3.3V"]
     AMS --> R33["3.3V Rail\n(Cin 10uF, Cout 22uF + 100nF)\nADC domain only"]
 
-    R33 --> ADS["ADS1115 (VDD)"]
-    R33 --> SSUP["Hall Sensor Supply"]
+    R33 --> FB3["FB3: Ferrite Bead"]
+    FB3 --> AVDD["AVDD (isolated analog rail)"]
+    AVDD --> ADS["ADS1115 (VDD)"]
+    AVDD --> SSUP["Hall Sensor VCC (J2 pin 2 of 3)"]
 
-    ESP <-->|"I2C: SDA/SCL + 4.7k pull-ups"| ADS
+    ESP <-->|"I2C: SDA/SCL + 4.7k pull-ups to AVDD"| ADS
 
-    subgraph SENSOR["Rudder Hall Sensor (0-360deg, ratiometric 0-3.3V)"]
+    subgraph SENSOR["Rudder Hall Sensor — 3 pins only: GND, VCC, SIG (0-360deg, ratiometric 0-3.3V)"]
         SSUP --> HALL["Hall Element"]
-        HALL --> SIG["Signal Out"]
-        HALL --> SGND["Sensor Local GND"]
+        HALL --> SIG["Signal Out (J2 pin 3)"]
     end
 
     subgraph FLOAT["Float Sensor Divider"]
@@ -43,15 +44,15 @@ flowchart TB
 
     SIG -->|"RC filter + ESD clamp"| AIN0["AIN0: Rudder Angle"]
     FNODE -->|"RC filter + ESD clamp\n0-1.4V"| AIN1["AIN1: Float Sensor"]
-    SSUP -->|"Kelvin sense wire + RC filter"| AIN2["AIN2: Sensor Supply Sense"]
-    SGND -->|"Kelvin sense wire + RC filter"| AIN3["AIN3: Sensor Ground Sense"]
+    AVDD -->|"RC filter + ESD clamp\n(no connector)"| AIN2["AIN2: Local AVDD Check"]
+    SYSGND["System GND (one unbroken pour)"] -->|"RC filter + ESD clamp\n(no connector)"| AIN3["AIN3: Local GND / Zero Ref"]
 
     AIN0 --> ADS
     AIN1 --> ADS
     AIN2 --> ADS
     AIN3 --> ADS
 
-    ADS -.->|"GND reference"| SYSGND["System GND (single-point star)"]
+    ADS -.->|"GND reference"| SYSGND
     ESP -.-> SYSGND
     AMS -.-> SYSGND
     LM -.-> SYSGND
@@ -151,12 +152,14 @@ Pick R/C for cutoff well below the ADS1115 conversion rate but well above the se
 
 - **AIN0 – Rudder angle**: Hall sensor signal output, ratiometric 0–3.3V, supplied from AVDD.
 - **AIN1 – Float sensor**: see §6a — a resistive divider output, 0–1.4V, biased from the **5V** rail (not 3.3V).
-- **AIN2 – Sensor supply sense**: a dedicated wire back from the Hall sensor's actual supply pin (Kelvin sense), *not* just tapped at the regulator. This is what lets you detect cable IR drop or connector resistance.
-- **AIN3 – Sensor ground sense**: a dedicated wire back from the Hall sensor's actual ground pin, referenced to the ADS1115's own GND. Any non-zero reading here is the IR drop / offset in the return conductor.
+- **AIN2 – Local AVDD supply check**: no connector, no cable — this channel just taps the board's own AVDD rail directly, right where it also feeds the Hall sensor's VCC pin and the ADS1115's own VDD.
+- **AIN3 – Local GND / zero reference**: no connector either — tied straight to GND. It should read ~0V at all times; a non-zero reading flags an ADC offset or a broken ground path on the board itself.
 
-This requires a 5-conductor cable to the Hall sensor (supply, ground, signal, +sense, −sense) rather than 3, if you want the sense readings to reflect what's happening at the sensor itself rather than just at the electronics enclosure. If a 5-wire run isn't practical, AIN2/AIN3 can instead just monitor the local 3.3V rail and local ground at the enclosure — still useful for catching regulator drift, but it won't correct for voltage dropped along the cable.
+**Only two channels have an external connector — and only one wire count each.** The Hall sensor is a plain **3-pin** part (GND, VCC, SIG), so J2 is a 3-pin connector; nothing about AIN2/AIN3 changes that. The float sender needs just its 2 wires into J3 (SIG, GND). Neither cable needs extra sense conductors.
 
-J2 (the 5-pin Hall sensor connector): a **2.5mm-pitch locking header, through-hole** (e.g. JST-XH 5-position) — a bare pin header or terminal block isn't a great choice here given this cable runs through a moving/vibrating part of the boat.
+This is a deliberate simplification from a true Kelvin-sense design, which would run 2 extra wires all the way to the Hall sensor's own supply/ground pins to cancel cable IR drop as well. With only 3 pins on the sensor, that option doesn't exist here — so AIN2/AIN3 fall back to reading the local rails instead. What you keep: correction for AVDD regulator drift/tolerance (the sensor's VCC is the same net AIN2 reads) and for the ADC's own offset error (via AIN3's zero reading). What you give up: correction for IR drop *in the sensor cable itself* — negligible in practice, since the Hall sensor draws very little current and the cable run is short.
+
+J2 (3-pin) and J3 (2-pin): both a **2.5mm-pitch locking header, through-hole** (e.g. JST-XH) — a bare pin header or terminal block isn't a great choice here given these cables run through a moving/vibrating part of the boat.
 
 **Firmware implication (drives why 4 single-ended channels is the right hardware choice):** since all four channels share one ADS1115 GND, compute the sensor's true ratiometric position as:
 
@@ -164,7 +167,7 @@ J2 (the 5-pin Hall sensor connector): a **2.5mm-pitch locking header, through-ho
 angle_ratio = (AIN0_reading - AIN3_reading) / (AIN2_reading - AIN3_reading)
 ```
 
-This cancels both regulator drift and cable/ground offset without needing true differential input pairs.
+This cancels AVDD regulator drift/tolerance and the ADC's own offset error, without needing true differential input pairs.
 
 ## 6a. AIN1 — float sensor divider (and why no op-amp is needed)
 
@@ -207,14 +210,14 @@ The Pro Mini form-factor board carries its own onboard regulator, so it's wired 
 
 - Keep GND **one unbroken copper pour** across the whole 2-layer board — don't cut it into separate power/digital/analog islands (see §4a on why a ground-side ferrite is skipped here). Get the star-ground *effect* through placement instead: group the ADS1115 and sensor front-end together, and route so their return currents converge near the ADS1115 rather than crossing through the buck converter's high-current loop.
 - Keep the LM2596's switching loop (inductor–diode–input cap) physically tight and away from the ADS1115 and sensor wiring.
-- Route the sensor cable as a twisted pair (signal+ground) with the sense wires twisted with their respective conductor; use overall shield grounded at the electronics end only (avoid ground loops).
+- Route the Hall sensor cable (J2, 3-conductor: GND/VCC/SIG) and the float sender cable (J3, 2-conductor: SIG/GND) as twisted pairs, shielded, grounded at the electronics end only (avoid ground loops). Neither needs extra sense conductors — AIN2/AIN3 read local board rails, not the sensor end of the cable (§6).
 - Add a 100Ω series resistor on I2C lines if traces/wires to the ADS1115 are long, to damp ringing.
 
 ## 9. Suggested schematic sheet organization (for KiCad/Eagle/Altium)
 
-1. **Power** — input protection, LM2596 buck, AMS1117 LDO, both rails brought out as labeled nets (`+5V`, `+3V3`, `GND`).
+1. **Power** — input protection (bridge rectifier), LM2596 buck, AMS1117 LDO + FB3, rails brought out as labeled nets (`+5V`, `AVDD`, `GND`).
 2. **MCU** — ESP32-C3 Pro Mini on the `+5V` rail (its own regulation, no external decoupling network needed), brought out as a labeled I2C bus (`SDA`, `SCL`) and GND.
-3. **ADC & Sensor Interface** — ADS1115 on the `+3V3` rail plus the four per-channel RC/clamp networks (including the AIN1 float-sensor divider fed from `+5V`), with connector footprints for the Hall sensor cable (5-pin, Kelvin sense) and the float sensor.
-4. **Connectors/Test points** — power input connector, sensor connector(s), and test points on `+5V`, `+3V3`, and each AINx for bring-up/debug.
+3. **ADC & Sensor Interface** — ADS1115 on the `AVDD` rail plus the four per-channel RC/clamp networks (AIN0/AIN1 to their connectors, AIN2/AIN3 tapping `AVDD`/`GND` directly with no connector), with connector footprints for just J2 (Hall sensor, 3-pin) and J3 (float sender, 2-pin).
+4. **Connectors/Test points** — power input connector, J2, J3, and test points on `+5V`, `AVDD`, and each AINx for bring-up/debug.
 
 Bringing each rail and bus out as a net label (rather than one flat sheet) keeps the schematic legible and matches how you'll actually probe the board during bring-up.

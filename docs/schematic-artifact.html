@@ -109,7 +109,7 @@
   <p class="lede">ESP32-C3 Pro Mini + ADS1115, powered from a 12&ndash;24V DC bus of unknown polarity through a bridge-rectifier input stage and an LM2596 buck. Two independent regulated rails: +5V runs the Pro Mini (self-regulating) and biases the float-sensor divider; +3.3V (AMS1117) feeds AVDD &mdash; a ferrite-isolated analog supply dedicated to the ADC and the Hall sensor's ratiometric supply, sharing one unbroken ground plane with the rest of the board.</p>
   <div class="doc-meta">
     <span><b>Project</b> RA-1 Rudder Angle Indicator</span>
-    <span><b>Rev</b> F</span>
+    <span><b>Rev</b> G</span>
     <span><b>Sheets</b> 1&ndash;4 of 4</span>
     <span><b>MCU</b> ESP32-C3 Pro Mini</span>
     <span><b>ADC</b> ADS1115</span>
@@ -135,7 +135,7 @@
       <div class="legend-item"><span class="swatch" style="background:var(--ink)"></span>Ground / chassis common</div>
       <div class="legend-item"><span class="swatch" style="background:var(--power)"></span>DC power rail (input, +5V, AVDD)</div>
       <div class="legend-item"><span class="swatch" style="background:var(--data)"></span>Digital bus (I&sup2;C, ALERT)</div>
-      <div class="legend-item"><span class="swatch" style="background:var(--sense)"></span>Analog sensor / Kelvin-sense line</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--sense)"></span>Analog sensor / ADC input line</div>
     </div>
     <div class="sym-key">
       <span><b>&#9633;</b> resistor</span>
@@ -154,7 +154,7 @@
   <section class="sheet" id="sheet1">
     <div class="sheet-head">
       <h2>Sheet 1 &mdash; Power input &amp; LM2596 buck (12/24V &rarr; 5V)</h2>
-      <span class="sheet-no">RA-1&ndash;01 &middot; Rev F</span>
+      <span class="sheet-no">RA-1&ndash;01 &middot; Rev G</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1300 480" role="img" aria-label="Schematic: two-pin DC input of unknown polarity feeding a fuse and a full bridge rectifier wired across both input legs, so the rectifier's output is always correct polarity regardless of how the input is wired. A unidirectional TVS diode and bulk capacitor follow the rectifier, then an LM2596 buck regulator producing a regulated +5V rail with an output inductor, catch diode, output filter capacitors, and a feedback jumper wired to the true regulated output.">
@@ -303,7 +303,7 @@
           <rect x="920" y="404" width="300" height="66"/>
           <text x="930" y="420" class="tb-strong">RA-1 &middot; POWER INPUT</text>
           <text x="930" y="436">SHEET 1 OF 4</text>
-          <text x="930" y="452">REV F</text>
+          <text x="930" y="452">REV G</text>
           <text x="1120" y="436">SIZE A4</text>
           <text x="1120" y="452">SCALE NONE</text>
         </g>
@@ -346,7 +346,7 @@
   <section class="sheet" id="sheet2">
     <div class="sheet-head">
       <h2>Sheet 2 &mdash; AMS1117-3.3 LDO &amp; rail distribution (5V &rarr; 3.3V)</h2>
-      <span class="sheet-no">RA-1&ndash;02 &middot; Rev F</span>
+      <span class="sheet-no">RA-1&ndash;02 &middot; Rev G</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: 5V rail from Sheet 1 feeding an AMS1117-3.3 linear regulator with input and output decoupling capacitors, producing a 3.3V rail. A ferrite bead (FB3) filters this rail before it becomes AVDD, the isolated analog supply feeding the ADS1115 and the Hall sensor, with a local decoupling capacitor after the bead. Ground stays a single unified net across the whole board — deliberately not split by a matching ground-side ferrite. The ESP32-C3 Pro Mini is not on this rail.">
@@ -459,7 +459,7 @@
   <section class="sheet" id="sheet3">
     <div class="sheet-head">
       <h2>Sheet 3 &mdash; ESP32-C3 Pro Mini</h2>
-      <span class="sheet-no">RA-1&ndash;03 &middot; Rev F</span>
+      <span class="sheet-no">RA-1&ndash;03 &middot; Rev G</span>
     </div>
     <figure class="sheet-panel">
       <svg viewBox="0 0 1040 340" role="img" aria-label="Schematic: ESP32-C3 Pro Mini board fed directly from the +5V rail, using its own onboard regulation, with only a small optional bulk capacitor added externally, and I2C SDA/SCL plus an ALERT interrupt line routed off-page to the ADS1115 sheet.">
@@ -543,10 +543,10 @@
   <section class="sheet" id="sheet4">
     <div class="sheet-head">
       <h2>Sheet 4 &mdash; ADS1115 &amp; sensor interface</h2>
-      <span class="sheet-no">RA-1&ndash;04 &middot; Rev F</span>
+      <span class="sheet-no">RA-1&ndash;04 &middot; Rev G</span>
     </div>
     <figure class="sheet-panel">
-      <svg viewBox="0 0 1160 1140" role="img" aria-label="Schematic: ADS1115 ADC with I2C pull-ups and ADDR tied low. AIN0 reads the Hall angle sensor through an RC filter and diode clamp. AIN1 reads a 5V-biased resistive divider (510 ohm fixed resistor on-board, 0 to 190 ohm float sender remote at the tank) through the same filter and clamp. AIN2 and AIN3 are Kelvin-sense lines back to the Hall sensor's own supply and ground pins, each with matching filter and clamp networks, connected through a five-pin connector to the sensor.">
+      <svg viewBox="0 0 1160 1140" role="img" aria-label="Schematic: ADS1115 ADC with I2C pull-ups and ADDR tied low. AIN0 reads the three-pin Hall angle sensor (ground, VCC, signal) through an RC filter and diode clamp, connected via a three-pin connector J2. AIN1 reads a 5V-biased resistive divider (510 ohm fixed resistor on-board, 0 to 190 ohm float sender remote at the tank) through a two-pin connector J3, with the same filter and clamp. AIN2 and AIN3 have no external connector at all -- they tap the board's own local AVDD rail and local GND directly, through the same filter and clamp, as a supply-health and zero-reference check.">
         <defs>
           <pattern id="g4" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="var(--grid-dot)"/></pattern>
           <g id="s4-res-h"><line class="sym-line" x1="-34" y1="0" x2="-15" y2="0"/><rect class="sym-body" x="-15" y="-8" width="30" height="16"/><line class="sym-line" x1="15" y1="0" x2="34" y2="0"/></g>
@@ -697,7 +697,7 @@
         <text class="lbl-sense" x="900" y="360" text-anchor="middle">AIN1 &middot; FLOAT SENSOR &mdash; 5V DIVIDER, 0&ndash;1.4V</text>
         <text class="lbl-faint" x="900" y="376" text-anchor="middle">Vout = 5V &times; R2/(R1+R2)  &mdash;  0&#8486;&rarr;0V, 190&#8486;&rarr;1.36V</text>
 
-        <!-- AIN2 y=670 : sensor supply Kelvin sense -->
+        <!-- AIN2 y=665 : local AVDD supply check — no external connector, taps the board's own rail -->
         <line class="wire wire-sense" x1="600" y1="665" x2="660" y2="665"/>
         <use href="#s4-res-h" x="700" y="665" class="wire-sense"/>
         <text class="lbl-faint" x="700" y="642" text-anchor="middle">R8 10k</text>
@@ -712,14 +712,17 @@
         <text class="lbl-faint" x="762" y="699">C13 1&#181;F</text>
         <line class="wire" x1="740" y1="711" x2="740" y2="725"/>
         <use href="#s4-gnd" x="740" y="725"/>
-        <line class="wire wire-sense" x1="740" y1="665" x2="1000" y2="665"/>
+        <line class="wire wire-sense" x1="740" y1="665" x2="900" y2="665"/>
+        <use href="#s4-flag-u-sm" x="900" y="665" class="offpage offpage-power"/>
+        <text class="lbl-power" x="900" y="645" text-anchor="middle" font-family="var(--font-mono)" font-weight="700" font-size="10">AVDD</text>
         <use href="#s4-dot" x="780" y="665"/>
         <use href="#s4-diode-sm-catU" x="780" y="681"/>
         <line class="wire" x1="780" y1="697" x2="780" y2="711"/>
         <use href="#s4-gnd" x="780" y="711"/>
-        <text class="lbl-sense" x="900" y="652" text-anchor="middle">AIN2 &middot; SENSOR SUPPLY SENSE (Kelvin)</text>
+        <text class="lbl-sense" x="900" y="600" text-anchor="middle">AIN2 &middot; LOCAL AVDD SUPPLY CHECK</text>
+        <text class="lbl-faint" x="900" y="616" text-anchor="middle">no connector — taps the board's own AVDD rail directly</text>
 
-        <!-- AIN3 y=910 : sensor ground Kelvin sense — clamp diodes only, no hard tie to system GND bus -->
+        <!-- AIN3 y=905 : local GND / zero-reference check — no external connector, direct tie to system GND -->
         <line class="wire wire-sense" x1="600" y1="905" x2="660" y2="905"/>
         <use href="#s4-res-h" x="700" y="905" class="wire-sense"/>
         <text class="lbl-faint" x="700" y="882" text-anchor="middle">R9 10k</text>
@@ -734,50 +737,57 @@
         <text class="lbl-faint" x="762" y="939">C14 1&#181;F</text>
         <line class="wire" x1="740" y1="951" x2="740" y2="965"/>
         <use href="#s4-gnd" x="740" y="965"/>
-        <line class="wire wire-sense" x1="740" y1="905" x2="1000" y2="905"/>
+        <line class="wire wire-sense" x1="740" y1="905" x2="900" y2="905"/>
+        <use href="#s4-gnd" x="900" y="905"/>
         <use href="#s4-dot" x="780" y="905"/>
         <use href="#s4-diode-sm-catU" x="780" y="921"/>
         <line class="wire" x1="780" y1="937" x2="780" y2="951"/>
         <use href="#s4-gnd" x="780" y="951"/>
-        <text class="lbl-sense" x="900" y="892" text-anchor="middle">AIN3 &middot; SENSOR GROUND SENSE (Kelvin, floating)</text>
-        <text class="lbl-faint" x="900" y="978" text-anchor="middle">clamp diodes conduct only outside normal</text>
-        <text class="lbl-faint" x="900" y="993" text-anchor="middle">range &mdash; don't tie this line to GND otherwise</text>
+        <text class="lbl-sense" x="900" y="855" text-anchor="middle">AIN3 &middot; LOCAL GND / ZERO REFERENCE</text>
+        <text class="lbl-faint" x="900" y="871" text-anchor="middle">no connector — deliberately tied straight to GND</text>
+        <text class="lbl-faint" x="900" y="985" text-anchor="middle">reads ~0V always; calibrates out the ADC's own offset error</text>
 
         <text class="lbl-faint" x="900" y="1055" text-anchor="middle">clamp diode pairs D3&ndash;D10: BAT54S dual packages (one AVDD leg / one GND leg per channel, all four AINx)</text>
 
-        <!-- J2 sensor connector -->
-        <rect class="sym-body" x="1000" y="90" width="90" height="880"/>
-        <text class="lbl" x="1045" y="76" text-anchor="middle">J2 &middot; RUDDER SENSOR</text>
-        <text class="lbl-faint" x="1045" y="990" text-anchor="middle">5-pin, shielded twisted-pair cable</text>
-        <text class="lbl-faint" x="970" y="65" text-anchor="end">SUPPLY</text>
-        <line class="wire wire-power" x1="1000" y1="60" x2="1030" y2="60"/>
-        <line class="wire wire-power" x1="1030" y1="60" x2="1030" y2="90"/>
-        <text class="lbl-faint" x="970" y="190" text-anchor="end">GND (return)</text>
-        <line class="wire" x1="1000" y1="230" x2="960" y2="230"/>
-        <line class="wire" x1="960" y1="230" x2="960" y2="1060"/>
-        <use href="#s4-gnd" x="960" y="1060"/>
+        <!-- J2: Hall sensor connector — just 3 pins (GND, VCC, SIG), no sense wires -->
+        <rect class="sym-body" x="1000" y="140" width="90" height="150"/>
+        <text class="lbl" x="1045" y="128" text-anchor="middle">J2 &middot; RUDDER SENSOR</text>
+        <text class="lbl-faint" x="1045" y="308" text-anchor="middle">3-pin: GND, VCC, SIG</text>
+        <text class="lbl-faint" x="1045" y="324" text-anchor="middle">shielded twisted-pair, no sense wires</text>
+
+        <text class="lbl-faint" x="970" y="190" text-anchor="end">SIG</text>
+
+        <text class="lbl-faint" x="970" y="230" text-anchor="end">VCC</text>
+        <use href="#s4-dot" x="980" y="60"/>
+        <line class="wire wire-power" x1="980" y1="60" x2="980" y2="230"/>
+        <line class="wire wire-power" x1="980" y1="230" x2="1000" y2="230"/>
+
+        <text class="lbl-faint" x="970" y="270" text-anchor="end">GND</text>
+        <line class="wire" x1="1000" y1="270" x2="960" y2="270"/>
+        <line class="wire" x1="960" y1="270" x2="960" y2="300"/>
+        <use href="#s4-gnd" x="960" y="300"/>
 
         <g class="titleblock">
           <rect x="820" y="1070" width="240" height="60"/>
           <text x="830" y="1086" class="tb-strong">RA-1 &middot; ADC + SENSOR</text>
           <text x="830" y="1102" >SHEET 4 OF 4</text>
-          <text x="830" y="1118">REV F</text>
+          <text x="830" y="1118">REV G</text>
           <text x="980" y="1102">SIZE A3</text>
           <text x="980" y="1118">SCALE NONE</text>
         </g>
         <text class="lbl-faint" x="80" y="1085">Firmware: angle_ratio = (AIN0 &minus; AIN3) &divide; (AIN2 &minus; AIN3)</text>
-        <text class="lbl-faint" x="80" y="1103">&mdash; cancels regulator drift and cable IR drop using the two Kelvin-sense channels.</text>
+        <text class="lbl-faint" x="80" y="1103">&mdash; cancels AVDD regulator drift/tolerance and the ADC's own offset error.</text>
       </svg>
-      <figcaption>All four ADC channels share one RC anti-alias filter + dual-diode clamp topology: the filter cap and the lower clamp diode are two independent branches off the signal node, both landing on GND in parallel &mdash; not chained through each other. The clamp pair (one leg to AVDD, one to GND) is a single BAT54S per channel; the filter cap is a separate part at the same node. Referenced to the ADS1115's own AVDD rail (the ferrite-filtered 3.3V from Sheet 2) regardless of what biases the signal; AIN1's divider itself runs off +5V, AIN2/AIN3 are true Kelvin sense lines back to the Hall sensor's own supply/ground pins.</figcaption>
+      <figcaption>Only two channels have external connectors: AIN0 (J2, 3-pin: GND/VCC/SIG to the Hall sensor) and AIN1 (J3, 2-pin: SIG/GND to the float sender). AIN2 and AIN3 have no connector at all &mdash; they tap the board's own AVDD rail and GND directly, as a supply-health and zero-reference check. All four channels share one RC anti-alias filter + dual-diode clamp topology: the filter cap and the lower clamp diode are two independent branches off the signal node, both landing on GND in parallel &mdash; not chained through each other. The clamp pair (one leg to AVDD, one to GND) is a single BAT54S per channel; the filter cap is a separate part at the same node.</figcaption>
     </figure>
 
     <ul class="notes">
+      <li><b>Why AIN2/AIN3 have no connector.</b> Earlier revisions of this design ran dedicated Kelvin-sense wires all the way to the Hall sensor's own supply/ground pins to cancel cable IR drop. Since the sensor only has 3 pins (GND, VCC, SIG) and there's no spare wire for that, AIN2/AIN3 instead read the board's own AVDD and GND directly &mdash; simpler wiring, and still catches the two things that actually matter here: AVDD regulator drift/tolerance (the Hall sensor's VCC is the same net, so this is what its ratiometric output is really relative to) and the ADC's own offset error. What it no longer catches is IR drop in the sensor cable itself &mdash; negligible in practice given the sensor's low current draw and a reasonably short, adequately-gauged cable run.</li>
       <li><b>No op-amp needed.</b> The AIN1 divider's Thevenin source impedance tops out around 138&#8486; (at R2=190&#8486;) &mdash; trivial next to the ADS1115's input, and the 10k&#8486; anti-alias resistor already dominates. A buffer would add a part and a failure point without fixing anything real. If the tank cable run is long and noisy, an optional MCP6001 follower between the divider node and R7 is the one case worth keeping as a footprint.</li>
       <li><b>Gain.</b> AIN0/AIN2/AIN3 comfortably use &plusmn;4.096V (gain=1). For AIN1, whose signal only reaches ~1.4V, set a higher per-conversion PGA gain (e.g. &plusmn;2.048V) to roughly double effective resolution &mdash; free, since the ADS1115 lets you change gain per channel.</li>
       <li><b>Mux settling.</b> Discard the first conversion after each channel switch; the ADS1115 has one ADC core behind a single mux.</li>
       <li><b>Confirm your sender's curve.</b> R2 = 0&ndash;190&#8486; matches a common European/VDO-style fuel or water sender; some senders run 0&ndash;90&#8486; or reversed &mdash; check yours before committing to R1 = 510&#8486;.</li>
-      <li><b>J2 wiring is the key design choice for the Hall sensor.</b> If a 5-conductor run isn't practical, AIN2/AIN3 can instead tap the local 3.3V rail and local ground at the enclosure &mdash; still catches regulator drift, but not cable drop.</li>
-      <li><b>Cable practice.</b> Twisted pair per signal+return, overall shield grounded at the electronics end only, routed clear of the LM2596 switching loop on Sheet 1.</li>
+      <li><b>Cable practice.</b> J2 (3-conductor) and J3 (2-conductor) as twisted pairs, shielded and grounded at the electronics end only, routed clear of the LM2596 switching loop on Sheet 1. Neither needs the 5-conductor run a Kelvin-sense design would have required.</li>
     </ul>
 
     <div class="tblwrap">
@@ -793,7 +803,7 @@
           <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4 packages</td><td>SOT-23</td><td>ESD/transient protection, one per AINx</td></tr>
           <tr><td>R1</td><td>Divider bias resistor</td><td>510&#8486;</td><td>0805</td><td>+5V to AIN1 divider node</td></tr>
           <tr><td>R2</td><td>Float sender (not a board part)</td><td>0&ndash;190&#8486; variable</td><td>N/A &mdash; remote panel-mount part, not on the PCB</td><td>Remote, at the tank</td></tr>
-          <tr><td>J2</td><td>Hall sensor connector</td><td>5-pin</td><td>THT, 2.5mm-pitch locking header (e.g. JST-XH 5-pos)</td><td>Supply, Sig, +Sense, GND, &minus;Sense</td></tr>
+          <tr><td>J2</td><td>Hall sensor connector</td><td>3-pin</td><td>THT, 2.5mm-pitch locking header (e.g. JST-XH 3-pos)</td><td>GND, VCC, SIG &mdash; no sense wires</td></tr>
           <tr><td>J3</td><td>Float sender connector</td><td>2-pin</td><td>THT, 2.5mm-pitch locking header (e.g. JST-XH 2-pos)</td><td>Sig, GND, to remote R2</td></tr>
         </tbody>
       </table>
@@ -806,7 +816,7 @@
   <section class="sheet" id="bom">
     <div class="sheet-head">
       <h2>Full bill of materials</h2>
-      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev F</span>
+      <span class="sheet-no">RA-1&ndash;BOM &middot; Rev G</span>
     </div>
     <div class="tblwrap">
       <table>
@@ -838,7 +848,7 @@
           <tr><td>D3&ndash;D10</td><td>Clamp diode pairs</td><td>BAT54S &times;4</td><td>SOT-23</td><td>4</td></tr>
           <tr><td>R1</td><td>Divider bias resistor</td><td>510&#8486;</td><td>0805</td><td>4</td></tr>
           <tr><td>R2</td><td>Float sender (remote)</td><td>0&ndash;190&#8486; variable</td><td>N/A &mdash; off-board</td><td>4</td></tr>
-          <tr><td>J2</td><td>Hall sensor connector</td><td>5-pin</td><td>THT, 2.5mm locking (JST-XH 5-pos)</td><td>4</td></tr>
+          <tr><td>J2</td><td>Hall sensor connector</td><td>3-pin</td><td>THT, 2.5mm locking (JST-XH 3-pos)</td><td>4</td></tr>
           <tr><td>J3</td><td>Float sender connector</td><td>2-pin</td><td>THT, 2.5mm locking (JST-XH 2-pos)</td><td>4</td></tr>
         </tbody>
       </table>
@@ -858,5 +868,5 @@
 </div>
 
 <footer>
-  RA-1 Rudder Angle Indicator &middot; Rev F &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
+  RA-1 Rudder Angle Indicator &middot; Rev G &middot; companion to <code>docs/HARDWARE-DESIGN.md</code> in the project repository.
 </footer>
