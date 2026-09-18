@@ -1,0 +1,297 @@
+<title>Rudder PCB Layout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#0b2338;
+    --panel:#0f3050;
+    --panel-line:rgba(223,240,250,.16);
+    --grid-dot:rgba(223,240,250,.10);
+    --ink:#eaf4fb;
+    --ink-dim:#87acc8;
+    --ink-faint:#5c85a3;
+    --power:#ffb454;
+    --data:#5eead4;
+    --sense:#c9a8ff;
+    --copper:#e0ac6e;
+    --board:#0d2f4e;
+    --font-sans:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Consolas,monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-sans);line-height:1.5;}
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 80px;}
+  header.hero{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:36px 8px;}
+  .kicker{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin:0 0 10px;}
+  h1{font-weight:700;font-size:clamp(26px,4.4vw,40px);margin:0 0 12px;text-wrap:balance;}
+  .lede{max-width:64ch;color:var(--ink-dim);font-size:15.5px;margin:0 0 22px;}
+  .doc-meta{display:flex;flex-wrap:wrap;gap:8px 22px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);border-top:1px solid var(--panel-line);padding-top:14px;}
+  .doc-meta b{color:var(--ink-dim);font-weight:600;}
+
+  .spec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--panel-line);border:1px solid var(--panel-line);border-radius:4px;overflow:hidden;margin-block:24px;}
+  .spec-cell{background:var(--panel);padding:14px 16px;}
+  .spec-cell .k{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 4px;}
+  .spec-cell .v{font-family:var(--font-mono);font-size:16px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .spec-cell .v small{font-size:11px;font-weight:400;color:var(--ink-dim);}
+
+  section.sheet{margin-block:48px;}
+  .sheet-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:14px;}
+  .sheet-head h2{font-size:19px;margin:0;font-weight:600;}
+  .sheet-head .sheet-no{font-family:var(--font-mono);color:var(--ink-faint);font-size:13px;}
+  .sheet-panel{background:var(--panel);border:1px solid var(--panel-line);border-radius:4px;padding:14px;}
+  .sheet-panel svg{display:block;width:100%;height:auto;}
+  figcaption{margin-top:10px;color:var(--ink-faint);font-size:13px;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:14px 24px;padding:14px 16px;background:var(--panel);border:1px solid var(--panel-line);border-radius:4px;margin-block:16px;font-family:var(--font-mono);font-size:12px;color:var(--ink-dim);}
+  .legend-item{display:flex;align-items:center;gap:8px;}
+  .swatch{width:14px;height:14px;border-radius:3px;flex:none;}
+
+  .notes{margin-top:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px 22px;}
+  .notes li{font-size:13.5px;color:var(--ink-dim);}
+  .notes li b{color:var(--ink);font-weight:600;}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  caption{text-align:left;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);margin-bottom:8px;}
+  thead th{text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;padding:7px 9px;border-bottom:1px solid var(--panel-line);white-space:nowrap;}
+  tbody td{padding:7px 9px;border-bottom:1px solid var(--panel-line);color:var(--ink-dim);font-variant-numeric:tabular-nums;}
+  tbody td:first-child{color:var(--ink);font-family:var(--font-mono);font-weight:600;white-space:nowrap;}
+  tbody tr:last-child td{border-bottom:none;}
+  .tblwrap{overflow-x:auto;background:var(--panel);border:1px solid var(--panel-line);border-radius:4px;padding:16px;margin-top:14px;}
+  .zone-power{color:var(--power);} .zone-ldo{color:var(--power);opacity:.85;} .zone-mcu{color:var(--data);}
+  .zone-exp{color:var(--data);} .zone-adc{color:var(--sense);} .zone-conn{color:var(--copper);}
+
+  .callout{background:var(--panel);border:1px solid var(--panel-line);border-left:3px solid var(--copper);border-radius:0 4px 4px 0;padding:14px 16px;font-size:13.5px;color:var(--ink-dim);margin-top:16px;}
+  .callout b{color:var(--ink);}
+  footer{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:20px 40px;color:var(--ink-faint);font-family:var(--font-mono);font-size:11.5px;border-top:1px solid var(--panel-line);}
+  @media (max-width:640px){.sheet-panel{padding:8px;}}
+</style>
+
+<header class="hero">
+  <p class="kicker">Derived from SCH_Rudder-Angle-Indicator-V1 &middot; EasyEDA</p>
+  <h1>Rudder angle indicator &mdash; PCB floorplan</h1>
+  <p class="lede">A compact 2-layer starting layout for your 53-part schematic: functional zones sized and placed to scale, the LM2596 switching loop kept tight and away from the ADC, and a board outline with 5mm-radius rounded corners you can trace directly in EasyEDA's board outline tool.</p>
+  <div class="doc-meta">
+    <span><b>Project</b> RA-1 Rudder Angle Indicator</span>
+    <span><b>Source</b> Sheet_1, 1.0</span>
+    <span><b>Layers</b> 2</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="spec-grid">
+    <div class="spec-cell"><p class="k">Board size</p><p class="v">95 &times; 70 <small>mm</small></p></div>
+    <div class="spec-cell"><p class="k">Corner radius</p><p class="v">5 <small>mm, all 4 corners</small></p></div>
+    <div class="spec-cell"><p class="k">Layers</p><p class="v">2 <small>top + bottom copper</small></p></div>
+    <div class="spec-cell"><p class="k">Mounting holes</p><p class="v">4&times; M3 <small>3.2mm drill</small></p></div>
+    <div class="spec-cell"><p class="k">Parts placed</p><p class="v">53 <small>from your schematic</small></p></div>
+  </div>
+
+  <section class="sheet" id="floorplan">
+    <div class="sheet-head">
+      <h2>Floorplan &mdash; to scale</h2>
+      <span class="sheet-no">RA-1&ndash;PCB01 &middot; Rev A</span>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="swatch" style="background:var(--power)"></span>Power in &amp; buck (12&ndash;24V &rarr; 5V)</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--power);opacity:.6"></span>LDO / AVDD</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--data)"></span>MCU &amp; expansion headers</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--sense)"></span>ADC + sensor front-end</div>
+      <div class="legend-item"><span class="swatch" style="background:var(--copper)"></span>Field connectors</div>
+    </div>
+
+    <figure class="sheet-panel">
+      <svg viewBox="0 0 1000 800" role="img" aria-label="Scaled top-down floorplan of a 95 by 70 millimeter two-layer PCB with 5 millimeter rounded corners, showing six functional zones: power input and buck converter top-left, LDO/AVDD stage top-center, MCU and expansion headers on the right edge, the ESP32-C3 module center-left, the ADS1115 and sensor front-end cluster center-right, and field connectors (Hall sensor, float sender, debug header, LED) along the bottom edge. The LM2596, its inductor, and catch diode are grouped tightly together, physically separated from the ADC cluster.">
+        <defs>
+          <pattern id="pgrid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1.4" fill="var(--grid-dot)"/></pattern>
+          <clipPath id="boardclip"><rect x="90" y="70" width="760" height="560" rx="40" ry="40"/></clipPath>
+        </defs>
+
+        <!-- board outline -->
+        <rect x="90" y="70" width="760" height="560" rx="40" ry="40" fill="var(--board)" stroke="var(--ink)" stroke-width="2.5"/>
+        <rect x="90" y="70" width="760" height="560" rx="40" ry="40" fill="url(#pgrid)" clip-path="url(#boardclip)"/>
+
+        <!-- zones -->
+        <g clip-path="url(#boardclip)">
+          <rect x="122" y="102" width="384" height="160" fill="var(--power)" opacity="0.14" stroke="var(--power)" stroke-width="1.5" stroke-dasharray="6 5"/>
+          <rect x="522" y="102" width="144" height="160" fill="var(--power)" opacity="0.09" stroke="var(--power)" stroke-width="1.5" stroke-dasharray="6 5"/>
+          <rect x="682" y="102" width="136" height="368" fill="var(--data)" opacity="0.10" stroke="var(--data)" stroke-width="1.5" stroke-dasharray="6 5"/>
+          <rect x="122" y="278" width="224" height="176" fill="var(--data)" opacity="0.14" stroke="var(--data)" stroke-width="1.5" stroke-dasharray="6 5"/>
+          <rect x="362" y="278" width="304" height="192" fill="var(--sense)" opacity="0.14" stroke="var(--sense)" stroke-width="1.5" stroke-dasharray="6 5"/>
+          <rect x="122" y="486" width="544" height="112" fill="var(--copper)" opacity="0.14" stroke="var(--copper)" stroke-width="1.5" stroke-dasharray="6 5"/>
+        </g>
+
+        <!-- zone labels -->
+        <text x="314" y="120" text-anchor="middle" class="zone-power" font-family="var(--font-mono)" font-weight="700" font-size="12">POWER IN + BUCK</text>
+        <text x="594" y="120" text-anchor="middle" class="zone-ldo" font-family="var(--font-mono)" font-weight="700" font-size="11">LDO / AVDD</text>
+        <text x="750" y="120" text-anchor="middle" class="zone-exp" font-family="var(--font-mono)" font-weight="700" font-size="10">EXPANSION</text>
+        <text x="234" y="296" text-anchor="middle" class="zone-mcu" font-family="var(--font-mono)" font-weight="700" font-size="12">MCU</text>
+        <text x="514" y="296" text-anchor="middle" class="zone-adc" font-family="var(--font-mono)" font-weight="700" font-size="12">ADC + SENSOR FRONT-END</text>
+        <text x="394" y="504" text-anchor="middle" class="zone-conn" font-family="var(--font-mono)" font-weight="700" font-size="12">FIELD CONNECTORS</text>
+
+        <!-- ===== Zone 1: Power ===== -->
+        <rect x="130" y="102" width="80" height="64" rx="3" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="170" y="98" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="11" font-weight="600">U7</text>
+        <text x="170" y="180" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="9">DC IN</text>
+
+        <rect x="237" y="120" width="26" height="13" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.2"/>
+        <text x="250" y="115" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="10">F1</text>
+
+        <rect x="286" y="110" width="40" height="32" rx="2" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="306" y="106" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="10">D2</text>
+
+        <rect x="356" y="124" width="44" height="36" rx="2" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="378" y="120" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="10">D3</text>
+
+        <circle cx="170" cy="222" r="40" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="170" y="226" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="11">C1</text>
+
+        <rect x="234" y="186" width="128" height="72" rx="3" fill="var(--panel)" stroke="var(--power)" stroke-width="2"/>
+        <text x="298" y="228" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="13" font-weight="700">U3</text>
+        <text x="298" y="177" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="9">LM2596</text>
+
+        <rect x="372" y="218" width="44" height="24" rx="2" fill="var(--panel)" stroke="var(--power)" stroke-width="2"/>
+        <text x="394" y="214" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="10">D1</text>
+
+        <rect x="416" y="140" width="100" height="100" rx="3" fill="var(--panel)" stroke="var(--power)" stroke-width="2"/>
+        <text x="466" y="194" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="13" font-weight="700">L1</text>
+        <path d="M 298 222 L 372 230 M 416 190 L 372 230" stroke="var(--power)" stroke-width="1" stroke-dasharray="3 3" fill="none" opacity="0.7"/>
+        <text x="466" y="255" text-anchor="middle" fill="var(--power)" font-family="var(--font-mono)" font-size="9">U3+D1+L1: keep tight</text>
+        <text x="220" y="255" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="9">C2 mirrors C1 at U3's output</text>
+
+        <!-- ===== Zone 2: LDO/AVDD ===== -->
+        <rect x="566" y="138" width="56" height="56" rx="3" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5"/>
+        <text x="594" y="170" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="11" font-weight="600">U4</text>
+        <rect x="541" y="160" width="26" height="13" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.2"/>
+        <text x="554" y="156" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="9">C3</text>
+        <rect x="621" y="160" width="26" height="13" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.2"/>
+        <text x="634" y="156" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="9">C4</text>
+        <rect x="588" y="227" width="13" height="6" fill="var(--panel)" stroke="var(--ink)" stroke-width="1"/>
+        <text x="594" y="245" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="9">L2 FB3</text>
+        <rect x="626" y="225" width="16" height="10" fill="var(--panel)" stroke="var(--ink)" stroke-width="1"/>
+        <text x="634" y="245" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="8">C6</text>
+
+        <!-- ===== Zone 3: Expansion headers ===== -->
+        <rect x="734" y="149" width="24" height="82" fill="var(--panel)" stroke="var(--data)" stroke-width="1.5"/>
+        <text x="775" y="194" text-anchor="start" fill="var(--ink)" font-family="var(--font-mono)" font-size="10">J6 &middot; HMI (4p)</text>
+        <rect x="734" y="259" width="24" height="102" fill="var(--panel)" stroke="var(--data)" stroke-width="1.5"/>
+        <text x="775" y="314" text-anchor="start" fill="var(--ink)" font-family="var(--font-mono)" font-size="10">J4 &middot; GPIO (5p)</text>
+        <rect x="734" y="369" width="24" height="102" fill="var(--panel)" stroke="var(--data)" stroke-width="1.5"/>
+        <text x="775" y="424" text-anchor="start" fill="var(--ink)" font-family="var(--font-mono)" font-size="10">J3 &middot; GPIO (6p)</text>
+
+        <!-- ===== Zone 4: MCU ===== -->
+        <rect x="142" y="294" width="184" height="144" rx="4" fill="var(--panel)" stroke="var(--data)" stroke-width="2"/>
+        <text x="234" y="370" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="15" font-weight="700">U5</text>
+        <text x="234" y="388" text-anchor="middle" fill="var(--ink-dim)" font-family="var(--font-mono)" font-size="10">ESP32-C3 SuperMini</text>
+        <text x="234" y="322" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="9">USB/reset edge &rarr; face board edge</text>
+
+        <!-- ===== Zone 5: ADC cluster ===== -->
+        <rect x="438" y="350" width="40" height="32" rx="2" fill="var(--panel)" stroke="var(--sense)" stroke-width="2"/>
+        <text x="458" y="370" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="11" font-weight="700">U6</text>
+        <rect x="397" y="436" width="26" height="20" rx="2" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.2"/>
+        <text x="410" y="432" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="9">R9</text>
+        <text x="514" y="410" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="9">R1&ndash;R7,R16 &middot; D4&ndash;D7 &middot; C5,C7&ndash;C12</text>
+        <text x="514" y="426" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="9">fill this zone &mdash; one RC+clamp group per AINx</text>
+        <text x="410" y="465" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="8">R10&ndash;R15 (0R links)</text>
+
+        <!-- ===== Zone 6: Field connectors ===== -->
+        <rect x="171.6" y="538" width="61" height="24" rx="2" fill="var(--panel)" stroke="var(--copper)" stroke-width="2"/>
+        <text x="202" y="533" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="10" font-weight="600">J2</text>
+        <rect x="293.6" y="538" width="41" height="24" rx="2" fill="var(--panel)" stroke="var(--copper)" stroke-width="2"/>
+        <text x="314" y="533" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="10" font-weight="600">J1</text>
+        <rect x="385.2" y="538" width="82" height="24" rx="2" fill="var(--panel)" stroke="var(--copper)" stroke-width="2"/>
+        <text x="426" y="533" text-anchor="middle" fill="var(--ink)" font-family="var(--font-mono)" font-size="10" font-weight="600">J5</text>
+        <rect x="546" y="553" width="16" height="10" fill="var(--panel)" stroke="var(--ink)" stroke-width="1"/>
+        <text x="554" y="580" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="9">LED1</text>
+        <rect x="546" y="521" width="16" height="10" fill="var(--panel)" stroke="var(--ink)" stroke-width="1"/>
+        <text x="590" y="524" text-anchor="start" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="9">R8</text>
+
+        <!-- edge callouts -->
+        <text x="202" y="602" text-anchor="middle" fill="var(--copper)" font-family="var(--font-mono)" font-size="10">Hall sensor</text>
+        <text x="314" y="602" text-anchor="middle" fill="var(--copper)" font-family="var(--font-mono)" font-size="10">Float sender</text>
+        <text x="426" y="602" text-anchor="middle" fill="var(--copper)" font-family="var(--font-mono)" font-size="10">Debug: AVDD/AIN2/AIN3/GND</text>
+        <text x="170" y="80" text-anchor="middle" fill="var(--power)" font-family="var(--font-mono)" font-size="10">DC power in (confirm U1 vs U7)</text>
+
+        <!-- mounting holes -->
+        <g fill="none" stroke="var(--ink-faint)" stroke-width="1.5">
+          <circle cx="146" cy="574" r="24"/><circle cx="146" cy="574" r="6" fill="var(--bg)"/>
+          <circle cx="794" cy="574" r="24"/><circle cx="794" cy="574" r="6" fill="var(--bg)"/>
+          <circle cx="146" cy="126" r="24"/><circle cx="146" cy="126" r="6" fill="var(--bg)"/>
+          <circle cx="794" cy="126" r="24"/><circle cx="794" cy="126" r="6" fill="var(--bg)"/>
+        </g>
+        <text x="146" y="608" text-anchor="middle" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="8">M3</text>
+
+        <!-- scale bar: 10mm -->
+        <line x1="90" y1="655" x2="170" y2="655" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="90" y1="649" x2="90" y2="661" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="170" y1="649" x2="170" y2="661" stroke="var(--ink)" stroke-width="2"/>
+        <text x="130" y="672" text-anchor="middle" fill="var(--ink-dim)" font-family="var(--font-mono)" font-size="10">10 mm</text>
+
+        <text x="850" y="672" text-anchor="end" fill="var(--ink-faint)" font-family="var(--font-mono)" font-size="10">95 &times; 70mm &middot; R5mm corners &middot; 2-layer</text>
+      </svg>
+      <figcaption>Dashed boxes are functional zones sized to scale; solid boxes are the components whose placement genuinely matters (switching loop, LDO, MCU, ADC, and every field connector). Small passives are called out by zone rather than individually &mdash; drop them in EasyEDA's PCB editor where real courtyard/DRC feedback will catch what a hand sketch can't.</figcaption>
+    </figure>
+
+    <ul class="notes">
+      <li><b>The one placement rule that matters most.</b> U3 (LM2596), D1 (catch diode) and L1 (inductor) form the buck's high-current switching loop &mdash; keep these three physically close with short, wide top-layer traces between them, and keep that whole cluster away from the ADC zone on the opposite side of the board. That separation is why the floorplan puts power top-left and the ADC cluster center-right, with the MCU module as a buffer between them.</li>
+      <li><b>Confirm which connector is DC input.</b> Your schematic has two unlabeled 2-pin parts near the power stage &mdash; U1 (a 2.54mm-pitch part) and U7 ("HC-PZ200", styled like a higher-current terminal block). I've placed U7 as the 12&ndash;24V input based on its part style, but check this against your schematic before finalizing; if it's reversed, swap U1 into the power zone and move U7 elsewhere.</li>
+      <li><b>J5 is a debug header, not a sensor cable.</b> It breaks out AVDD, AIN2, AIN3 and GND &mdash; useful for probing the local supply-check and zero-reference channels during bring-up without hunting for tiny SMD pads.</li>
+      <li><b>J3/J4/J6 pin assignments.</b> These carry your spare GPIOs (IO0&ndash;IO7), I&sup2;C, ALERT and the HMI UART (HMI_RXD/TXD) in some combination across the three headers &mdash; the schematic's net labels didn't let me confirm the exact pin-for-pin split with certainty, so verify against your own sheet before silkscreening pin functions.</li>
+      <li><b>Rounded corners in EasyEDA.</b> Draw the board outline on the Board Outline layer as a rectangle, then use the Fillet Corner tool (or Edit &rarr; Fillet on selected corner vertices) and enter 5mm as the radius for all four corners &mdash; simplest done after the rectangle exists, before placing keep-outs near the edges.</li>
+      <li><b>Layer usage.</b> Top layer: component placement plus the switching loop and ADC signal traces (keep these short and direct). Bottom layer: a single unbroken ground pour plus the 5V/AVDD power traces &mdash; consistent with the no-ground-split decision from the schematic (Sheet 2 notes).</li>
+    </ul>
+  </section>
+
+  <section class="sheet" id="bom">
+    <div class="sheet-head">
+      <h2>Component &rarr; zone assignment</h2>
+      <span class="sheet-no">RA-1&ndash;PCB01 &middot; full placement list</span>
+    </div>
+    <div class="tblwrap">
+      <table>
+        <caption>All 53 parts from your schematic, grouped by the zone they land in</caption>
+        <thead><tr><th>Zone</th><th>Ref</th><th>Value / part</th><th>Package</th><th>Placement note</th></tr></thead>
+        <tbody>
+          <tr><td class="zone-power">Power</td><td>U7</td><td>2-pin power in</td><td>HC-PZ200 (2p)</td><td>Board edge, wire entry facing out</td></tr>
+          <tr><td class="zone-power">Power</td><td>U8 (F1)</td><td>Fuse</td><td>F1206</td><td>In series, right after U7</td></tr>
+          <tr><td class="zone-power">Power</td><td>D2</td><td>Bridge rectifier, MSB56L</td><td>UMSB</td><td>After fuse</td></tr>
+          <tr><td class="zone-power">Power</td><td>D3</td><td>TVS, SMBJ33A</td><td>SMB</td><td>Shunt to GND after bridge</td></tr>
+          <tr><td class="zone-power">Power</td><td>C1, C2</td><td>330&#181;F bulk &times;2</td><td>CAP-SMD &oslash;10</td><td>Flank U3 &mdash; input and output</td></tr>
+          <tr><td class="zone-power">Power</td><td>U3</td><td>LM2596SX-5.0</td><td>TO-263-5</td><td>Switching-loop cluster with D1, L1</td></tr>
+          <tr><td class="zone-power">Power</td><td>D1</td><td>Catch diode, SS34</td><td>SMA</td><td>Right at U3's switch pin</td></tr>
+          <tr><td class="zone-power">Power</td><td>L1</td><td>47&#181;H, CDRH127NP</td><td>12.5&times;12.5mm</td><td>Tightest loop with U3/D1</td></tr>
+          <tr><td class="zone-ldo">LDO/AVDD</td><td>U4</td><td>AMS1117-3.3</td><td>SOT-223</td><td>&mdash;</td></tr>
+          <tr><td class="zone-ldo">LDO/AVDD</td><td>C3, C4</td><td>22&#181;F tantalum &times;2</td><td>CASE-A 3216</td><td>Flank U4</td></tr>
+          <tr><td class="zone-ldo">LDO/AVDD</td><td>L2</td><td>Ferrite bead, FB3</td><td>0603</td><td>Between shared 3.3V and AVDD</td></tr>
+          <tr><td class="zone-ldo">LDO/AVDD</td><td>C6</td><td>100nF decoupling</td><td>C0805</td><td>Right after L2</td></tr>
+          <tr><td class="zone-mcu">MCU</td><td>U5</td><td>ESP32-C3 SuperMini</td><td>ESP32-C3-PRO-MINI module</td><td>Face USB/reset toward an accessible edge</td></tr>
+          <tr><td class="zone-exp">Expansion</td><td>J3</td><td>GPIO breakout</td><td>HDR 1&times;6</td><td>Right edge, stacked with J4/J6</td></tr>
+          <tr><td class="zone-exp">Expansion</td><td>J4</td><td>GPIO breakout</td><td>HDR 1&times;5</td><td>Right edge</td></tr>
+          <tr><td class="zone-exp">Expansion</td><td>J6</td><td>HMI UART</td><td>HDR 1&times;4</td><td>Right edge, nearest the top</td></tr>
+          <tr><td class="zone-adc">ADC cluster</td><td>U6</td><td>ADS1115IDGSR</td><td>MSOP-10</td><td>Center of cluster</td></tr>
+          <tr><td class="zone-adc">ADC cluster</td><td>R1&ndash;R7, R16</td><td>10k&#8486; &times;8</td><td>R0805</td><td>I&sup2;C pull-ups + one per AINx</td></tr>
+          <tr><td class="zone-adc">ADC cluster</td><td>D4&ndash;D7</td><td>BAT54S &times;4</td><td>SOT-23</td><td>One per AINx, next to its resistor</td></tr>
+          <tr><td class="zone-adc">ADC cluster</td><td>C5, C6, C10</td><td>100nF decoupling</td><td>C0805</td><td>At U6 VDD and nearby ICs</td></tr>
+          <tr><td class="zone-adc">ADC cluster</td><td>C7, C8, C9, C11, C12</td><td>1&#181;F filter &times;5</td><td>C0805</td><td>One per AINx anti-alias node</td></tr>
+          <tr><td class="zone-adc">ADC cluster</td><td>R9</td><td>510&#8486; divider bias</td><td>R1210</td><td>Near J1 (float sender)</td></tr>
+          <tr><td class="zone-adc">ADC cluster</td><td>R10, R11</td><td>0&#8486; link &times;2</td><td>R1206</td><td>Config/strap jumpers</td></tr>
+          <tr><td class="zone-adc">ADC cluster</td><td>R12&ndash;R15</td><td>0&#8486; link &times;4</td><td>R0805</td><td>Config/strap jumpers</td></tr>
+          <tr><td class="zone-conn">Connectors</td><td>J2</td><td>Hall sensor</td><td>HDR 1&times;3</td><td>Bottom edge</td></tr>
+          <tr><td class="zone-conn">Connectors</td><td>J1</td><td>Float sender</td><td>HDR 1&times;2</td><td>Bottom edge</td></tr>
+          <tr><td class="zone-conn">Connectors</td><td>J5</td><td>Debug: AVDD/AIN2/AIN3/GND</td><td>HDR 1&times;4</td><td>Bottom edge</td></tr>
+          <tr><td class="zone-conn">Connectors</td><td>LED1, R8</td><td>Status LED + 270&#8486;</td><td>LED0805 + R0805</td><td>Bottom edge, visible from outside</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <b>What I read from your file, not assumed:</b> every reference designator, value and package above came straight out of your uploaded EasyEDA schematic JSON (53 parts, 1 sheet) &mdash; this isn't the generic BOM from earlier in our conversation. Two things I couldn't fully resolve from the schematic alone are flagged in the notes above (which 2-pin part is DC input, and the exact J3/J4/J6 pin-for-pin split) &mdash; confirm those against your own sheet before you finalize silkscreen or send it to fab.
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  RA-1 Rudder Angle Indicator &middot; PCB floorplan &middot; derived from SCH_Rudder-Angle-Indicator-V1_2026-09-18.json
+</footer>
