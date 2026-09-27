@@ -194,6 +194,28 @@ What *is* worth doing instead of adding hardware: since the float signal only re
 
 The only case where a buffer earns its keep: if the float sender cable run is long and picks up noise before reaching the board. If so, add an optional single op-amp voltage follower (e.g. MCP6001, powered from the 3.3V ADC rail with its output clamped by the existing protection diodes) between the divider node and the RC filter — worth keeping as an unpopulated footprint if you're unsure yet, rather than committing to it now.
 
+## 6b. Open-wire fault detection
+
+Both sensors' cables can fail open, and you want to know when that happens rather than silently indicating a wrong angle or level. The two channels behave very differently on an open wire, and that difference is the whole story here.
+
+**AIN1 (float sender) — already deterministic, no hardware change.** The divider is a passive network: +5V → R1 (510Ω) → node → R2 (sender, 0–190Ω) → GND. Break *either* conductor in the 2-wire cable to the sender and the loop opens — no current flows anywhere in the divider, so there's no drop across R1, and the node floats up to the full 5V-side rail as seen through the filter (reading ≈3.3V full-scale on the ADC, since AVDD clamps it there). That's a clean, guaranteed-by-Ohm's-law fault signature, comfortably outside the normal ~1.0–1.5V operating band you described. A short to GND (or a sender legitimately reaching R2=0Ω, if that's a real position in its travel) reads near 0V — also detectable, *unless* 0Ω is itself a valid physical position, in which case that end of the range can't distinguish "fault" from "real reading" by voltage alone.
+
+**AIN0 (Hall angle sensor) — not guaranteed without help, which is why R10 exists.** This sensor has three pins and an actively-driven output stage, not a passive divider. Restricting real use to 135–225° keeps the legitimate reading inside roughly 1.24–2.06V (out of the full 0–3.3V range the sensor is capable of) — that unused headroom on both sides is what makes catching a fault possible in principle. But *what a disconnected active output settles to isn't specified by any datasheet* — depending on the sensor IC's internal structure, an open OUT, VCC, or GND pin can leave the node floating, drifting, or picking up noise ("oscillation," matching what you'd expect), and nothing guarantees it lands outside the normal window. It might just as easily wander back inside 1.24–2.06V and look like a plausible — but wrong — angle.
+
+**The fix: R10, a 100kΩ pull-up from the AIN0 node to AVDD** (added in Rev H of the schematic, same node as the existing RC filter and BAT54S clamp). Sized so that:
+- **It won't meaningfully load the sensor when the sensor IS driving the line.** 100kΩ against a typical Hall sensor output impedance of a few hundred ohms to a few kΩ is a <1–2% divider error — negligible for this application. (If your specific sensor's datasheet shows a notably higher output impedance, size up to 470kΩ–1MΩ to keep the error down; that just slows the fault response a little.)
+- **It firmly wins once the sensor stops driving the line**, whichever of the three wires broke — OUT, VCC, or GND all leave the sensor's output stage no longer actively fighting the pull-up, so the node settles to ~AVDD. Response time is set by R10 and the existing filter cap C11: ~100kΩ × 1µF ≈ 100ms, plenty fast against a rudder that can't move instantaneously anyway.
+
+This gives AIN0 the *same* "pegged near AVDD = open wire" signature AIN1 already had, so your firmware only needs one fault-detection routine, not two.
+
+**Firmware logic (no further hardware needed beyond R10):**
+1. **Windowed range check.** Flag a fault if a reading sits outside its expected band with margin — e.g. AIN0 outside ~1.0–2.3V, AIN1 outside its real min/max — for N consecutive samples (debounce against a single noise spike).
+2. **Rate-of-change / plausibility check.** A rudder or float can only move so fast; flag a fault if the reading changes faster than that between samples. This catches a floating pin that happens to be noisy but still nominally "in range" — exactly the oscillation case you flagged.
+3. **Cross-check AIN2 before blaming the sensor.** AIN2 (local AVDD) and AIN3 (zero reference) tell you whether the supply itself is healthy. If AVDD is out of spec, an odd AIN0/AIN1 reading is a power problem, not a wiring problem — check supply health first so you don't misdiagnose the fault.
+4. **A short doesn't need R10.** A wire shorted to GND or to AVDD already forces a clean, deterministic rail voltage on its own — the range check alone catches that, on either channel, with no extra hardware.
+
+**Indication needs no new hardware either** — you already have both pieces: **LED1** (with its 270Ω resistor) for a local blink-code (e.g. 2 blinks = angle sensor fault, 3 blinks = float sensor fault, so a technician can diagnose without a display), and the **HMI UART link (J6)** to show a plain-language fault message on your display.
+
 ## 7. ESP32-C3 Pro Mini
 
 The Pro Mini form-factor board carries its own onboard regulator, so it's wired far more simply than a bare module:
